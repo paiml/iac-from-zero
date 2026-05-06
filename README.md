@@ -3,7 +3,7 @@
 ![IaC From Zero hero](assets/hero.png)
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![forjar](https://img.shields.io/badge/forjar-1.4.1-ff8a4c.svg?logo=rust&logoColor=white)](https://github.com/paiml/forjar)
+[![forjar](https://img.shields.io/badge/forjar-1.4.2-ff8a4c.svg?logo=rust&logoColor=white)](https://github.com/paiml/forjar)
 [![Falsifiable claims](https://img.shields.io/badge/falsifiable%20claims-10-7ee787.svg)](https://github.com/paiml/forjar)
 [![Labs](https://img.shields.io/badge/labs-5%20passing-brightgreen.svg)](labs/)
 [![Recipe](https://img.shields.io/badge/recipes-de--pipeline--host-9c84ff.svg)](recipes/de-pipeline-host.yaml)
@@ -36,9 +36,10 @@ Clone and bootstrap:
     git clone https://github.com/paiml/iac-from-zero
     cd iac-from-zero
 
-    # Install forjar — course-pinned to v1.3.0; v1.4.1 also works.
-    cargo install forjar --version 1.4.1 --locked
-    forjar --version          # → forjar 1.4.1
+    # Install forjar — course-pinned to v1.3.0; v1.4.2 is recommended
+    # for the C3-through-force demonstration in lab-01 (see CHANGELOG).
+    cargo install forjar --version 1.4.2 --locked
+    forjar --version          # → forjar 1.4.2
 
 ## Quick start
 
@@ -144,7 +145,7 @@ platform.
 
 Local sanity checklist before submitting an issue:
 
-    cargo install forjar --version 1.4.1 --locked
+    cargo install forjar --version 1.4.2 --locked
     make validate     # all five lab solutions + the recipe schema check
     make verify       # all six fixture diffs match
     make demo         # lab-01 applies, re-applies cleanly (claim C3)
