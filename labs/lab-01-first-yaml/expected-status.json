@@ -2,7 +2,7 @@
   "global": {
     "machines": {
       "localhost": {
-        "converged": 4,
+        "converged": 0,
         "failed": 0,
         "resources": 4
       }
