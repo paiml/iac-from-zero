@@ -1,0 +1,23 @@
+version: "1.0"
+name: lab-03-drift
+description: "Lab 3 starter — declare a stack, then deliberately drift it"
+
+params:
+  base: /tmp/iac-from-zero-lab03
+
+machines:
+  localhost:
+    hostname: localhost
+    addr: 127.0.0.1
+
+# TODO(learner): three resources:
+# 1. base-dir at {{params.base}} (directory, mode 0755)
+# 2. heartbeat at {{params.base}}/heartbeat.txt (file, mode 0644,
+#    depends_on base-dir, content includes a literal "heartbeat: ok")
+# 3. cron-stub at {{params.base}}/cron-stub.conf (file, mode 0644,
+#    depends_on base-dir, content has a cron line for the heartbeat)
+#
+# Then run the drill in the README.
+
+resources:
+  # Empty — fill in.

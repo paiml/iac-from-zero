@@ -1,0 +1,133 @@
+name: iac
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  FORJAR_VERSION: "1.4.1"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # The matrix entry does the actual work. The `gate` aggregator below is
+  # the status check the org's `Green Main` ruleset keys off of — it
+  # requires a check named literally `gate`, which matrix expansion
+  # doesn't emit.
+  gate-matrix:
+    name: gate-matrix (forjar ${{ matrix.forjar }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        forjar: ["1.4.1"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache forjar binary
+        id: forjar-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/forjar
+          key: forjar-${{ matrix.forjar }}-x86_64-unknown-linux-gnu
+
+      - name: Install Rust toolchain (only on cache miss)
+        if: steps.forjar-cache.outputs.cache-hit != 'true'
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install forjar
+        if: steps.forjar-cache.outputs.cache-hit != 'true'
+        run: |
+          set -eux
+          # Per the lab playbook the canonical install is the prebuilt
+          # musl binary from GitHub releases at v1.3.0. v1.4.1 is on
+          # crates.io but has no GitHub release yet, so we fall back to
+          # cargo install for the version this repo's fixtures were
+          # captured with. The binary is cached above; subsequent CI
+          # runs skip this entirely.
+          cargo install forjar --version ${{ matrix.forjar }} --locked
+          forjar --version
+
+      - name: Verify forjar is on PATH
+        run: forjar --version
+
+      - name: Validate every lab solution
+        run: |
+          set -eux
+          # Labs 1–4 each have a single solution/forjar.yaml.
+          for lab in lab-01-first-yaml lab-02-dag lab-03-drift lab-04-plan-pin; do
+            forjar validate -f labs/$lab/solution/forjar.yaml
+          done
+          # Lab 5 has two composing stacks instead of one forjar.yaml.
+          forjar validate -f labs/lab-05-recipes/solution/de-dev.yaml
+          forjar validate -f labs/lab-05-recipes/solution/de-staging.yaml
+
+      - name: Plan every lab (no apply — labs are local-state)
+        run: |
+          set -eux
+          for lab in lab-01-first-yaml lab-02-dag lab-03-drift \
+                     lab-04-plan-pin; do
+            forjar plan -f labs/$lab/solution/forjar.yaml \
+              --state-dir labs/$lab/solution/state
+          done
+          forjar plan -f labs/lab-05-recipes/solution/de-dev.yaml \
+            --state-dir labs/lab-05-recipes/solution/state
+          forjar plan -f labs/lab-05-recipes/solution/de-staging.yaml \
+            --state-dir labs/lab-05-recipes/solution/state
+
+      - name: Apply Lab 1 + verify idempotency (claim C3)
+        run: |
+          set -eux
+          cd labs/lab-01-first-yaml/solution
+          forjar apply -f forjar.yaml --yes --force
+          # Second apply must report 0 converged.
+          out=$(forjar apply -f forjar.yaml --yes --force | tail -3)
+          echo "$out"
+          echo "$out" | grep -E "0 converged" || {
+            echo "::error::C3 violated — second apply did not report 0 converged"
+            exit 1
+          }
+
+      - name: Verify fixture diffs
+        run: bash scripts/verify-fixtures.sh
+
+      - name: Pin + pin --check (claim C1)
+        run: |
+          set -eux
+          cd labs/lab-04-plan-pin/solution
+          forjar apply -f forjar.yaml --yes --force
+          forjar pin -f forjar.yaml
+          forjar pin --check -f forjar.yaml
+          # Manually corrupt + recheck fail (the C1 demo).
+          cp state/forjar.inputs.lock.yaml /tmp/lock.bak
+          sed -i 's/blake3:[0-9a-f]\{6\}/blake3:DEADBEEF/' state/forjar.inputs.lock.yaml
+          if forjar pin --check -f forjar.yaml; then
+            echo "::error::pin --check should have failed on corrupted lock"
+            exit 1
+          fi
+          mv /tmp/lock.bak state/forjar.inputs.lock.yaml
+          forjar pin --check -f forjar.yaml
+
+  # Aggregator. The org's main-branch ruleset requires a status check
+  # named exactly `gate`. The matrix above only emits
+  # `gate-matrix (forjar X)` rows. This job collapses the matrix into
+  # one check name auto-merge can find.
+  gate:
+    name: gate
+    needs: [gate-matrix]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Verify all jobs succeeded
+        run: |
+          if [ "${{ needs.gate-matrix.result }}" != "success" ]; then
+            echo "::error::gate-matrix failed (result=${{ needs.gate-matrix.result }})"
+            exit 1
+          fi
+          echo "✓ all gates passed"

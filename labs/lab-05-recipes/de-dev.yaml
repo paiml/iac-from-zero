@@ -1,0 +1,16 @@
+version: "1.0"
+name: de-dev
+description: "Lab 5 starter — dev composing stack"
+
+machines:
+  localhost:
+    hostname: localhost
+    addr: 127.0.0.1
+
+# TODO(learner): one resource of type: recipe that imports `de-pipeline-host`
+# from ./recipes/de-pipeline-host.yaml. Inputs: postgres_version "15",
+# etl_user "de-dev", data_dir "/tmp/iac-from-zero-lab05/dev",
+# cron_schedule "0 * * * *" (hourly).
+#
+# See solution/de-dev.yaml for the reference shape.
+resources:

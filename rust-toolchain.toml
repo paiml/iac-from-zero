@@ -1,0 +1,6 @@
+# forjar v1.3.0 is the course-pinned tool. The companion repo itself has
+# no Rust crate, but this file pins the toolchain in case a learner adds
+# one during the capstone (e.g. wrapping the Course 3 ETL binary).
+[toolchain]
+channel = "1.95"
+components = ["rustfmt", "clippy"]

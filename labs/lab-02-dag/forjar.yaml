@@ -1,0 +1,43 @@
+version: "1.0"
+name: lab-02-dag
+description: "Lab 2 starter — wire `depends_on` so the DAG resolves correctly"
+
+params:
+  base: /tmp/iac-from-zero-lab02
+  user: de-cron-runner
+
+machines:
+  localhost:
+    hostname: localhost
+    addr: 127.0.0.1
+
+# TODO(learner): five file resources. The DAG should be:
+#   base-dir → data-dir → state-marker
+#                       → log-dir   → logrotate-config
+#
+# 1. Add `base-dir` (directory at {{params.base}}, mode 0755).
+# 2. Add `data-dir` (directory at {{params.base}}/data) depends_on base-dir.
+# 3. Add `log-dir` (directory at {{params.base}}/log) depends_on data-dir.
+# 4. Add `state-marker` (file at {{params.base}}/data/state.json) depends_on data-dir.
+# 5. Add `logrotate-config` (file at {{params.base}}/log/logrotate.conf) depends_on log-dir.
+#
+# Then run:
+#   forjar plan -f forjar.yaml --json | jq '.execution_order'
+# and verify the order is the topological + alphabetical-tie-broken one.
+#
+# Once the linear chain works, deliberately introduce a cycle:
+#   change base-dir's depends_on to [logrotate-config]
+# and run `forjar validate -f forjar.yaml`. Observe the parse-time error.
+# That's claim C4 — cycles caught before any side effect.
+
+resources:
+  # base-dir given as a stub — fill in the rest.
+  base-dir:
+    type: file
+    machine: localhost
+    path: "{{params.base}}"
+    state: directory
+    mode: "0755"
+    tags: [lab2, base]
+
+  # TODO(learner): the four other resources go here.

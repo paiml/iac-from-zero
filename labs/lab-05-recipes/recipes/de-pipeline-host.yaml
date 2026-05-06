@@ -1,0 +1,31 @@
+# Starter for the de-pipeline-host recipe.
+#
+# Finish this so it accepts four typed inputs and provisions five
+# resources (a data dir, an etl subdir, a pipeline config file, a
+# cron-stub file, a logrotate config file). See README.md.
+
+recipe:
+  name: de-pipeline-host
+  description: "Provision a Postgres-client + nightly-ETL host with logrotate"
+  inputs:
+    # TODO(learner): four inputs:
+    #   postgres_version: type string, no default (required)
+    #   etl_user:         type string, no default (required)
+    #   data_dir:         type string, default /data
+    #   cron_schedule:    type string, default "0 2 * * *"
+    postgres_version:
+      type: string
+      description: "Major Postgres version this host is targeting"
+
+    # TODO(learner): the other three inputs go here.
+
+resources:
+  # TODO(learner): five resources:
+  #   data-dir         — directory at {{inputs.data_dir}}
+  #   etl-dir          — directory at {{inputs.data_dir}}/etl, depends_on data-dir
+  #   config           — file at {{inputs.data_dir}}/etl/pipeline.yaml,
+  #                       embeds postgres_version, etl_user, data_dir,
+  #                       cron_schedule into the content
+  #   cron-stub        — file at {{inputs.data_dir}}/etl/cron.d-de-etl,
+  #                       cron line referencing the etl_user + cron_schedule
+  #   logrotate        — file at {{inputs.data_dir}}/etl/logrotate-de-etl.conf

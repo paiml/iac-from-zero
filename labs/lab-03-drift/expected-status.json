@@ -1,0 +1,51 @@
+{
+  "global": {
+    "machines": {
+      "localhost": {
+        "converged": 3,
+        "failed": 0,
+        "resources": 3
+      }
+    },
+    "name": "lab-03-drift",
+    "schema": "1.0"
+  },
+  "machines": [
+    {
+      "hostname": "localhost",
+      "machine": "localhost",
+      "resource_count": 3,
+      "resources": {
+        "base-dir": {
+          "details": {
+            "mode": "0755",
+            "path": "/tmp/iac-from-zero-lab03"
+          },
+          "hash": "blake3:f10981f246fed44933aa07d5345793b7383a1d72448d6718c27bde6e6528d6f3",
+          "status": "converged",
+          "type": "file"
+        },
+        "cron-stub": {
+          "details": {
+            "content_hash": "blake3:0036c94104907bb98b0b41f16e00039a0254eba3760bb08dbef0fd10d068e984",
+            "mode": "0644",
+            "path": "/tmp/iac-from-zero-lab03/cron-stub.conf"
+          },
+          "hash": "blake3:1419ade560070732a11ef0b6768e068bd42a932c46685d193fac009e1503540d",
+          "status": "converged",
+          "type": "file"
+        },
+        "heartbeat": {
+          "details": {
+            "content_hash": "blake3:67121ec810787ca36059dff94f435c9b06730b3bf1fa03f8d343a795c1db5edc",
+            "mode": "0644",
+            "path": "/tmp/iac-from-zero-lab03/heartbeat.txt"
+          },
+          "hash": "blake3:9ce809d552fafa5a1a34b6e0dae4bfecb0e4472ab410556b29dfbbed951860ad",
+          "status": "converged",
+          "type": "file"
+        }
+      }
+    }
+  ]
+}

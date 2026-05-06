@@ -1,0 +1,19 @@
+# forjar's state/ tree is ephemeral apply output. Lock files are
+# regenerated on first `forjar apply`; the rest is per-run logs and
+# trace data. Nothing under state/ is committed.
+**/state/
+
+# /tmp is where the labs converge (so the repo working tree stays
+# clean after make demo / make verify). Never commit it.
+/tmp/
+
+# Local pmat / pv tooling state
+/.pmat/
+/.pmat-metrics/
+/.pv/
+
+# Build artifacts (no Rust crate yet, but reserved)
+/target/
+
+.env
+.DS_Store

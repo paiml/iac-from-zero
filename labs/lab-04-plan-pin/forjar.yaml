@@ -1,0 +1,17 @@
+version: "1.0"
+name: lab-04-plan-pin
+description: "Lab 4 starter — plans as contracts, pin --check as gate"
+
+params:
+  base: /tmp/iac-from-zero-lab04
+
+machines:
+  localhost:
+    hostname: localhost
+    addr: 127.0.0.1
+
+# TODO(learner): three resources, one of which gets renamed via a
+# `moved:` block. See solution/forjar.yaml for the reference shape.
+
+resources:
+  # Empty — fill in.

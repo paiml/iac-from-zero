@@ -1,0 +1,32 @@
+version: "1.0"
+name: de-staging
+description: "Lab 5 — staging composing stack: bigger data dir, nightly ETL"
+
+machines:
+  localhost:
+    hostname: localhost
+    addr: 127.0.0.1
+
+resources:
+  pipeline:
+    type: recipe
+    machine: localhost
+    recipe: de-pipeline-host
+    inputs:
+      postgres_version: "16"
+      etl_user: de-staging
+      data_dir: /tmp/iac-from-zero-lab05/staging
+      cron_schedule: "0 2 * * *"
+    tags: [stack, staging]
+
+  # Staging has an extra archive directory the dev stack doesn't need —
+  # demonstrates that a composing stack adds to a recipe rather than
+  # being limited to it.
+  archive-dir:
+    type: file
+    machine: localhost
+    path: /tmp/iac-from-zero-lab05/staging/archive
+    state: directory
+    mode: "0755"
+    depends_on: [pipeline]
+    tags: [stack, staging]

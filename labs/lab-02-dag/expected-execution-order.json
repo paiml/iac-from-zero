@@ -1,0 +1,7 @@
+[
+  "base-dir",
+  "data-dir",
+  "log-dir",
+  "state-marker",
+  "logrotate-config"
+]

@@ -1,0 +1,58 @@
+version: "1.0"
+name: lab-04-plan-pin
+description: "Lab 4 reference: plans as contracts + moved blocks + pin --check"
+
+params:
+  base: /tmp/iac-from-zero-lab04
+
+machines:
+  localhost:
+    hostname: localhost
+    addr: 127.0.0.1
+
+# Three resources. Apply once, then refactor `heartbeat` → `de-heartbeat`
+# via a moved block (no destroy + create), then `forjar pin` to capture
+# input hashes, then manually edit the lock to demonstrate `pin --check`
+# rejecting the drift.
+resources:
+  base-dir:
+    type: file
+    machine: localhost
+    path: "{{params.base}}"
+    state: directory
+    mode: "0755"
+    tags: [lab4]
+
+  de-heartbeat:
+    type: file
+    machine: localhost
+    path: "{{params.base}}/heartbeat.txt"
+    state: file
+    content: |
+      # Lab 4: this resource is `de-heartbeat` after the moved block.
+      # Before the rename it was `heartbeat`. The lock file's resource
+      # entry was rewritten in place — no recreate, no lost state.
+      heartbeat: ok
+    mode: "0644"
+    depends_on: [base-dir]
+    tags: [lab4]
+
+  schedule-readme:
+    type: file
+    machine: localhost
+    path: "{{params.base}}/SCHEDULE.txt"
+    state: file
+    content: |
+      # Lab 4 — the schedule resource (immortal, no rename).
+      0 2 * * *  /usr/local/bin/de-etl --run nightly
+    mode: "0644"
+    depends_on: [base-dir]
+    tags: [lab4]
+
+# Declarative renames — processed before planning. Remove this block
+# after the rename is applied (the lock has the new name; the moved
+# entry is a one-time migration). Keeping it indefinitely is harmless
+# but adds noise.
+moved:
+  - from: heartbeat
+    to: de-heartbeat

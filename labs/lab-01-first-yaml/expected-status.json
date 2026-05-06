@@ -1,0 +1,60 @@
+{
+  "global": {
+    "machines": {
+      "localhost": {
+        "converged": 4,
+        "failed": 0,
+        "resources": 4
+      }
+    },
+    "name": "lab-01-first-yaml",
+    "schema": "1.0"
+  },
+  "machines": [
+    {
+      "hostname": "localhost",
+      "machine": "localhost",
+      "resource_count": 4,
+      "resources": {
+        "config-dir": {
+          "details": {
+            "mode": "0755",
+            "path": "/tmp/iac-from-zero-lab01/config"
+          },
+          "hash": "blake3:f9e376578af0479f7fb7374ba43591ef2a76fbaa3726658a3997f19ca8758496",
+          "status": "converged",
+          "type": "file"
+        },
+        "data-dir": {
+          "details": {
+            "mode": "0755",
+            "path": "/tmp/iac-from-zero-lab01"
+          },
+          "hash": "blake3:8bd282c12c3e38f0160d319346d3f0f9c41a819589e32b212f1a9659aa4d0d3d",
+          "status": "converged",
+          "type": "file"
+        },
+        "de-config": {
+          "details": {
+            "content_hash": "blake3:52f7661b2c6a17dc25192d9f07db87ecf4df3ef645113d5e5fb4a62958220d70",
+            "mode": "0644",
+            "path": "/tmp/iac-from-zero-lab01/config/de.yaml"
+          },
+          "hash": "blake3:acff2ad5e88ed859a8ae5b039aa9e4467550a1ec3f38285c51b061adce86a921",
+          "status": "converged",
+          "type": "file"
+        },
+        "readme-marker": {
+          "details": {
+            "content_hash": "blake3:91800fb112a8dc52b5ff8366b666aec32490cf5c1dcc40c4d87d35f01dbcbcf8",
+            "mode": "0644",
+            "path": "/tmp/iac-from-zero-lab01/README.txt"
+          },
+          "hash": "blake3:5fee4ecdfc0050a833d891477d3aaf675428ea76b3c941ad4cb835b35e01f4f9",
+          "status": "converged",
+          "type": "file"
+        }
+      }
+    }
+  ]
+}

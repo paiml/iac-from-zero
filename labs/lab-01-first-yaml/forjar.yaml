@@ -1,0 +1,35 @@
+version: "1.0"
+name: lab-01-first-yaml
+description: "Lab 1 starter — finish this so it converges 4 resources, then no-ops on second apply"
+
+# TODO(learner): change `data_dir` to /tmp/iac-from-zero-lab01 and pick a `user` name.
+params:
+  user: REPLACE_ME
+  data_dir: REPLACE_ME
+
+machines:
+  localhost:
+    hostname: localhost
+    addr: 127.0.0.1
+
+resources:
+  # The first resource is given. Add three more so the lab matches
+  # the README's acceptance criteria.
+  data-dir:
+    type: file
+    machine: localhost
+    path: "{{params.data_dir}}"
+    state: directory
+    mode: "0755"
+    tags: [lab1, file]
+
+  # TODO(learner): add `config-dir` — a directory at {{params.data_dir}}/config,
+  # mode 0755, depending on data-dir.
+
+  # TODO(learner): add `de-config` — a file at {{params.data_dir}}/config/de.yaml
+  # with mode 0644, depending on config-dir. The content should embed
+  # `data_dir` and `user` from params using {{params.<key>}}.
+
+  # TODO(learner): add `readme-marker` — a file at {{params.data_dir}}/README.txt,
+  # mode 0644, depending on data-dir, with a short message saying the directory
+  # is managed by forjar.

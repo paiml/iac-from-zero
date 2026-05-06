@@ -1,0 +1,20 @@
+version: "1.0"
+name: de-dev
+description: "Lab 5 — dev composing stack: small data dir, hourly ETL"
+
+machines:
+  localhost:
+    hostname: localhost
+    addr: 127.0.0.1
+
+resources:
+  pipeline:
+    type: recipe
+    machine: localhost
+    recipe: de-pipeline-host
+    inputs:
+      postgres_version: "15"
+      etl_user: de-dev
+      data_dir: /tmp/iac-from-zero-lab05/dev
+      cron_schedule: "0 * * * *"
+    tags: [stack, dev]

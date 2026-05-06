@@ -1,0 +1,20 @@
+version: "1.0"
+name: de-staging
+description: "Lab 5 starter — staging composing stack"
+
+machines:
+  localhost:
+    hostname: localhost
+    addr: 127.0.0.1
+
+# TODO(learner): same recipe, different inputs:
+#   postgres_version "16", etl_user "de-staging",
+#   data_dir "/tmp/iac-from-zero-lab05/staging",
+#   cron_schedule "0 2 * * *" (nightly).
+#
+# Plus an extra resource (archive-dir) at
+# /tmp/iac-from-zero-lab05/staging/archive that's not in the recipe.
+# Demonstrates that a composing stack can extend a recipe.
+#
+# See solution/de-staging.yaml for the reference shape.
+resources:
