@@ -11,8 +11,12 @@ verify_status() {
     local expected="$REPO/labs/$labname/expected-status.json"
     if [ ! -f "$expected" ]; then return 0; fi
     pushd "labs/$labname/solution" > /dev/null
+    # First apply uses --force to recover from any leftover /tmp state
+    # (e.g. lab-03 left a file rm'd from a prior drift drill). The
+    # second apply must NOT use --force — it's the steady-state read
+    # we diff against the committed fixture.
     forjar apply -f forjar.yaml --yes --force > /dev/null 2>&1
-    forjar apply -f forjar.yaml --yes --force > /dev/null 2>&1
+    forjar apply -f forjar.yaml --yes > /dev/null 2>&1
     forjar status --json --state-dir state \
       | jq -S 'del(.global.last_apply, .global.machines.localhost.last_apply,
                    .machines[].generated_at, .machines[].resources[].applied_at,
@@ -33,6 +37,7 @@ verify_status() {
 verify_lab02_order() {
     pushd labs/lab-02-dag/solution > /dev/null
     forjar apply -f forjar.yaml --yes --force > /dev/null 2>&1
+    forjar apply -f forjar.yaml --yes > /dev/null 2>&1
     forjar plan -f forjar.yaml --json | jq -S '.execution_order' \
       > /tmp/my-order.json
     if diff -q <(jq -S . "$REPO/labs/lab-02-dag/expected-execution-order.json") \
@@ -48,6 +53,7 @@ verify_lab02_order() {
 verify_lab04_plan() {
     pushd labs/lab-04-plan-pin/solution > /dev/null
     forjar apply -f forjar.yaml --yes --force > /dev/null 2>&1
+    forjar apply -f forjar.yaml --yes > /dev/null 2>&1
     forjar plan -f forjar.yaml --json --state-dir state \
       | jq -S '{name, unchanged, to_create, to_update, to_destroy,
                 real_changes: (.changes | map(select(.action != "no_op")) | length)}' \
@@ -65,7 +71,9 @@ verify_lab04_plan() {
 verify_lab05_plans() {
     pushd labs/lab-05-recipes/solution > /dev/null
     forjar apply -f de-dev.yaml --yes --force > /dev/null 2>&1
+    forjar apply -f de-dev.yaml --yes > /dev/null 2>&1
     forjar apply -f de-staging.yaml --yes --force > /dev/null 2>&1
+    forjar apply -f de-staging.yaml --yes > /dev/null 2>&1
     for stack in dev staging; do
         forjar plan -f de-$stack.yaml --json --state-dir state \
           | jq -S '{name, resources: (.changes | length)}' \

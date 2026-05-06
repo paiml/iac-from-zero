@@ -85,9 +85,13 @@ jobs:
         run: |
           set -eux
           cd labs/lab-01-first-yaml/solution
+          # The first apply may use --force to overwrite any leftover
+          # /tmp state from a prior CI run on the same runner cache.
+          # The second apply MUST NOT use --force — --force is forjar's
+          # "re-converge regardless of lock" override, which by design
+          # makes idempotency unobservable.
           forjar apply -f forjar.yaml --yes --force
-          # Second apply must report 0 converged.
-          out=$(forjar apply -f forjar.yaml --yes --force | tail -3)
+          out=$(forjar apply -f forjar.yaml --yes | tail -3)
           echo "$out"
           echo "$out" | grep -E "0 converged" || {
             echo "::error::C3 violated — second apply did not report 0 converged"
