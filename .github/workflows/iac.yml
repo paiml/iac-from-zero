@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  FORJAR_VERSION: "1.4.1"
+  FORJAR_VERSION: "1.4.2"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        forjar: ["1.4.1"]
+        forjar: ["1.4.2"]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -81,20 +81,39 @@ jobs:
           forjar plan -f labs/lab-05-recipes/solution/de-staging.yaml \
             --state-dir labs/lab-05-recipes/solution/state
 
-      - name: Apply Lab 1 + verify idempotency (claim C3)
+      - name: Apply Lab 1 + verify idempotency through --force (claim C3 / forjar #129)
         run: |
           set -eux
           cd labs/lab-01-first-yaml/solution
-          # The first apply may use --force to overwrite any leftover
-          # /tmp state from a prior CI run on the same runner cache.
-          # The second apply MUST NOT use --force — --force is forjar's
-          # "re-converge regardless of lock" override, which by design
-          # makes idempotency unobservable.
+          # First apply converges from cold.
           forjar apply -f forjar.yaml --yes --force
+
+          # Second apply WITH --force: classical claim-C3 demo via the
+          # "lock said unchanged" mechanic. Pre-1.4.2 forjar, --force
+          # reported `N converged, 0 unchanged` regardless of whether
+          # the lock matched, making C3 unobservable. From 1.4.2 the
+          # JSON summary surfaces forced_noop_count + actual_changes,
+          # and `actual_changes == 0` is the proof.
+          summary=$(forjar apply -f forjar.yaml --yes --force --json | jq -c '.summary')
+          echo "summary: $summary"
+          actual=$(echo "$summary" | jq '.actual_changes')
+          forced=$(echo "$summary" | jq '.forced_noop_count')
+          if [ "$actual" != "0" ]; then
+            echo "::error::C3 violated — actual_changes=$actual on a fully-converged stack"
+            exit 1
+          fi
+          if [ "$forced" != "4" ]; then
+            echo "::error::expected forced_noop_count=4 (the four lab-1 resources), got $forced"
+            exit 1
+          fi
+          echo "✓ C3 holds through --force (forced_noop_count=$forced, actual_changes=$actual)"
+
+          # And without --force, the steady-state run still reports
+          # 0 converged / 4 unchanged — the original C3 read-out shape.
           out=$(forjar apply -f forjar.yaml --yes | tail -3)
           echo "$out"
           echo "$out" | grep -E "0 converged" || {
-            echo "::error::C3 violated — second apply did not report 0 converged"
+            echo "::error::C3 violated — second unforced apply did not report 0 converged"
             exit 1
           }
 

@@ -5,6 +5,19 @@ follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Bumped forjar pin from 1.4.1 to 1.4.2 (paiml/forjar#129 +
+  [v1.4.2 release](https://github.com/paiml/forjar/releases/tag/v1.4.2)).
+  forjar 1.4.2 surfaces `forced_noop_count` and `actual_changes` in the
+  apply summary, which makes claim **C3** observable through `--force`.
+- Lab-1 CI assertion now uses the new behaviour as a positive proof:
+  applies with `--force`, reads `summary.actual_changes` from the JSON
+  output, asserts it equals 0 (the C3-PASS shape on a fully-converged
+  stack). The previous workaround — dropping `--force` from the C3
+  assertion — has been removed; both forced and unforced second
+  applies are now exercised.
+
 ### Added
 - `labs/lab-01-first-yaml/` — Module 1 lab: write your first `forjar.yaml`,
   apply it twice, observe `0 changes` (claim **C3**)
