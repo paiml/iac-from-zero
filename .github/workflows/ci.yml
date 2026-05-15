@@ -1,0 +1,64 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  CARGO_TERM_COLOR: always
+  RUST_BACKTRACE: 1
+
+jobs:
+  demo-all:
+    name: forjar demo gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo bin
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/forjar
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+          key: forjar-${{ runner.os }}-v1
+
+      - name: Install forjar
+        run: |
+          if ! command -v forjar >/dev/null 2>&1; then
+            cargo install forjar --locked
+          fi
+          forjar --version
+
+      - name: make demo-all
+        run: make demo-all
+
+  shellcheck:
+    name: shellcheck Makefile shell snippets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: |
+          sudo apt-get update && sudo apt-get install -y shellcheck
+          # Lint any .sh files that ship with demos
+          find . -name '*.sh' -print0 | xargs -0 -r shellcheck
+
+  yaml-lint:
+    name: yamllint forjar configs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: yamllint
+        run: |
+          pip install yamllint
+          # relaxed: 160-char line limit + allow empty values
+          yamllint -d '{extends: default, rules: {line-length: {max: 160}, empty-values: disable, document-start: disable}}' \
+            $(find . -name 'forjar.yaml' -o -path './includes/*.yaml')

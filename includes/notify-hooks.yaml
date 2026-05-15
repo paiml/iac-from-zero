@@ -1,0 +1,8 @@
+# Shared metadata params for forjar-cookbook recipes
+# Included by all recipes for consistent labeling
+version: '1.0'
+name: notify-hooks
+
+params:
+  forjar_cookbook: "true"
+  forjar_cookbook_version: "1.0"

@@ -1,156 +1,91 @@
-# IaC From Zero — Companion Repo
+# iac-from-zero
 
-![IaC From Zero hero](assets/hero.png)
+<p align="center">
+  <img src="assets/hero.svg" alt="OpenTofu features paired with forjar equivalents — plan, apply, state, lifecycle, drift, testing" width="100%"/>
+</p>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![forjar](https://img.shields.io/badge/forjar-1.4.2-ff8a4c.svg?logo=rust&logoColor=white)](https://github.com/paiml/forjar)
-[![Falsifiable claims](https://img.shields.io/badge/falsifiable%20claims-10-7ee787.svg)](https://github.com/paiml/forjar)
-[![Labs](https://img.shields.io/badge/labs-5%20passing-brightgreen.svg)](labs/)
-[![Recipe](https://img.shields.io/badge/recipes-de--pipeline--host-9c84ff.svg)](recipes/de-pipeline-host.yaml)
-[![Capstone](https://img.shields.io/badge/capstone-Module%205-336791.svg)](capstone/)
-[![GitHub last commit](https://img.shields.io/github/last-commit/paiml/iac-from-zero)](https://github.com/paiml/iac-from-zero/commits/main)
-[![GitHub repo size](https://img.shields.io/github/repo-size/paiml/iac-from-zero)](https://github.com/paiml/iac-from-zero)
+[![CI](https://github.com/paiml/iac-from-zero/actions/workflows/ci.yml/badge.svg)](https://github.com/paiml/iac-from-zero/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-MIT%20OR%20Apache--2.0-blue.svg)](#license)
+[![Rust](https://img.shields.io/badge/rust-1.75%2B-orange.svg)](https://www.rust-lang.org/)
 
-Sibling repos in the same series:
-[paiml/postgres-from-zero](https://github.com/paiml/postgres-from-zero) ·
-[paiml/duckdb-from-zero](https://github.com/paiml/duckdb-from-zero) ·
-[paiml/mysql-from-zero](https://github.com/paiml/mysql-from-zero)
+Companion repository for the **IAC from Zero** Coursera course — course 21 of
+the [Rust for Data Engineering](https://www.coursera.org/specializations/rust-for-data-engineering)
+specialization.
 
-The runnable companion to the Coursera course **IaC From Zero**, part of
-the *Rust for Data Engineering* specialization. Declarative, bare-metal-first
-Infrastructure as Code in Rust using **forjar** — a single-binary Rust IaC tool
-with BLAKE3 content-addressed state and deterministic DAG execution. No cloud
-APIs, no Terraform providers, no Ansible Python runtime. Just a YAML file, a
-Rust binary, and a lock file.
+Twelve side-by-side demos that teach IAC fundamentals by pairing one OpenTofu
+feature with its [`forjar`](https://github.com/paiml/forjar) equivalent. Every
+demo ships both an HCL `main.tf` and a `forjar.yaml`, so the diff between the
+two files IS the lesson.
 
-## Installation
+## What this repo demonstrates
 
-Prerequisites:
+- **M1 — first apply** — declarative IAC, plan/apply, BLAKE3 lock files
+  (cookbook recipe 01 `developer-workstation`)
+- **M2 — state and plan** — saved plans (recipe 30) and JSON plan output
+  (recipe 31): `tfplan` files vs forjar lock files; `terraform show -json` vs
+  `forjar plan --format json`
+- **M3 — lifecycle and refactoring** — `lifecycle` blocks (recipe 33),
+  `moved` blocks (recipe 34), `-target` (recipe 36) vs forjar's idempotent
+  recipes and content-addressed resource IDs
+- **M4 — drift and convergence** — `refresh-only` (recipe 35),
+  `check` blocks (recipe 32), `terraform_remote_state` (recipe 39) vs forjar's
+  local BLAKE3 compare, runtime contracts, and pinned recipe imports
+- **M5 — testing, security, capstone** — `.tftest.hcl` (recipe 37),
+  state encryption (recipe 38), and a canary-deployment capstone (recipe 94)
+  asserting all 10 falsifiable forjar claims against a real fleet
 
-- Rust 1.95+ via rustup (`rust-toolchain.toml` pins to 1.95)
-- `jq` for the self-check fixture diffs
-- ~50 MB free disk for forjar + the per-lab `state/` directories
+## Demo map
 
-Clone and bootstrap:
+| Lesson | OpenTofu feature | forjar concept | Demo directory |
+|---|---|---|---|
+| 1.1.3 | `terraform apply` | `forjar apply` + BLAKE3 lock | [`m1-first-apply/`](m1-first-apply/) |
+| 2.1.2 | `terraform plan -out=plan.tfplan` | `forjar plan --lock` | [`m2-state-and-plan/2.1.2-saved-plan/`](m2-state-and-plan/2.1.2-saved-plan/) |
+| 2.1.3 | `terraform show -json` | `forjar plan --format json` | [`m2-state-and-plan/2.1.3-json-plan/`](m2-state-and-plan/2.1.3-json-plan/) |
+| 3.1.1 | `lifecycle { prevent_destroy }` | idempotent recipe + content hash | [`m3-lifecycle/3.1.1-lifecycle/`](m3-lifecycle/3.1.1-lifecycle/) |
+| 3.1.2 | `moved { from to }` | recipe composition by BLAKE3 ID | [`m3-lifecycle/3.1.2-moved-blocks/`](m3-lifecycle/3.1.2-moved-blocks/) |
+| 3.1.3 | `terraform apply -target=` | `forjar apply --recipe` | [`m3-lifecycle/3.1.3-resource-targeting/`](m3-lifecycle/3.1.3-resource-targeting/) |
+| 4.1.1 | `terraform plan -refresh-only` | local BLAKE3 hash compare | [`m4-drift/4.1.1-refresh-only/`](m4-drift/4.1.1-refresh-only/) |
+| 4.1.2 | `check { assert {} }` | forjar runtime contracts (C1–C10) | [`m4-drift/4.1.2-check-blocks/`](m4-drift/4.1.2-check-blocks/) |
+| 4.1.3 | `terraform_remote_state` | recipe import + hash pin | [`m4-drift/4.1.3-cross-config/`](m4-drift/4.1.3-cross-config/) |
+| 5.1.1 | `.tftest.hcl` | `forjar plan-test` | [`m5-testing-security/5.1.1-testing-dsl/`](m5-testing-security/5.1.1-testing-dsl/) |
+| 5.1.2 | `state_encryption {}` | content-addressed signed state | [`m5-testing-security/5.1.2-state-encryption/`](m5-testing-security/5.1.2-state-encryption/) |
+| 5.1.3 | full canary fleet | recipe 94 + all 10 contracts asserted | [`m5-testing-security/5.1.3-capstone-canary-fleet/`](m5-testing-security/5.1.3-capstone-canary-fleet/) |
 
-    git clone https://github.com/paiml/iac-from-zero
-    cd iac-from-zero
+The cookbook recipe numbers (01, 30–39, 94) refer to
+[`paiml/forjar-cookbook`](https://github.com/paiml/forjar-cookbook) — the
+qualification suite that proves forjar against real infrastructure. Each demo
+directory is a minimal restatement of one cookbook recipe paired with the
+equivalent Terraform/OpenTofu HCL.
 
-    # Install forjar — course-pinned to v1.3.0; v1.4.2 is recommended
-    # for the C3-through-force demonstration in lab-01 (see CHANGELOG).
-    cargo install forjar --version 1.4.2 --locked
-    forjar --version          # → forjar 1.4.2
+## Prerequisites
 
-## Quick start
+- Rust 1.75+ (`rustup default stable`) — for `cargo install forjar`
+- `tofu` 1.7+ or `terraform` 1.5+ — for the OpenTofu/HCL side of every demo
+- Docker — recipe 01 (M1) and recipe 94 (M5 capstone) use container transports
 
-    make help        # list every Makefile entry point
-    make validate    # forjar validate every lab solution + the recipe
-    make plan        # forjar plan every lab solution
-    make demo        # apply lab-01-first-yaml twice — second pass = 0 changes
-    make verify      # diff each lab's status against expected-status.json
+## Run the demos
 
-The labs are graded by `expected-status.json` / `expected-execution-order.json`
-fixtures. `make verify` is the canonical green-tick: applies each lab solution
-and diffs its current status against the committed fixture.
+```bash
+git clone https://github.com/paiml/iac-from-zero
+cd iac-from-zero
 
-## Usage
+# One-time: install forjar from crates.io
+make install
 
-The five module labs and the capstone live under `labs/` and `capstone/`:
+# Run validate + plan on all 12 demos (no real infrastructure touched)
+make demo-all
 
+# Run a single demo by lesson id
+make demo-1.1.3       # first apply
+make demo-2.1.2       # saved plans
+make demo-5.1.3       # capstone canary fleet
 ```
-labs/
-├── lab-01-first-yaml/    # Module 1: declarative + plan/apply (claim C3 idempotency)
-├── lab-02-dag/           # Module 2: depends_on + DAG resolver  (claim C2 + C4)
-├── lab-03-drift/         # Module 3: drift detection + healing  (claim C5 + C6 + C10)
-├── lab-04-plan-pin/      # Module 4: plans, moved blocks, pin   (claim C1)
-└── lab-05-recipes/       # Module 5: typed inputs, composition  (claim C7)
 
-recipes/
-└── de-pipeline-host.yaml # the recipe Lab 5 produces; reused by the capstone
-
-capstone/                 # stub pointing at the Coursera capstone reading
-```
-
-Each lab ships:
-
-- `README.md` — learner-facing instructions + the "drill" that demonstrates
-  the falsifiable claim
-- `forjar.yaml` — starter config (TODO comments — learners finish it)
-- `solution/forjar.yaml` (or `solution/de-{dev,staging}.yaml` for Lab 5) —
-  reference implementation for instructor self-check
-- `expected-*.json` — committed fixture for the self-check diff
-
-## Falsifiable claims this course exercises
-
-The course's pedagogical fingerprint is forjar's set of falsifiable claims.
-Every module touches at least one by name:
-
-| Claim | Statement                                                          | Where exercised |
-|-------|--------------------------------------------------------------------|-----------------|
-| C1    | Deterministic input hashing — same inputs in, same BLAKE3 out      | Lab 4, capstone |
-| C2    | Deterministic execution order — Kahn topo sort + alphabetical tie  | Lab 2           |
-| C3    | Idempotency — re-applying converged config yields 0 changes        | Lab 1, capstone |
-| C4    | Cycles caught at parse time — no side effect, no partial apply     | Lab 2 (drill)   |
-| C5    | Content-addressed state — lock file is the source of truth         | Lab 3, Lab 4    |
-| C6    | Atomic state persistence — temp-file + rename, never torn writes   | Lab 3           |
-| C7    | Recipe input validation — typed inputs fail at parse time          | Lab 5           |
-| C10   | Jidoka — first failed resource halts; partial state preserved       | Lab 3 (drill)   |
-
-The course teaches IaC by teaching **how to falsify claims about IaC tools.**
-Every lab's "drill" is a concrete experiment that would expose the claim if
-forjar were broken.
-
-## Why bare-metal-first matters
-
-forjar's strength is real machines over SSH. The labs deliberately reduce to
-`localhost` because Coursera lab containers are single-host. The pedagogical
-concepts — declarative, DAG, lock file, drift, store — are identical at
-single-host scale. When you graduate from `addr: 127.0.0.1` to a fleet of
-real bare-metal nodes, the YAML changes; the discipline doesn't.
-
-Compared to the alternatives:
-
-- **Terraform**: provider-shaped (every cloud has its own surface), remote
-  state backend required, drift detection means polling APIs at scale.
-  forjar walks a local lock file in milliseconds.
-- **Ansible**: imperative playbooks, no concept of drift detection, "keep
-  going past errors" by default. forjar declares relationships (DAG) and
-  halts on first failure (Jidoka, C10).
-- **Hand-rolled bash**: the failure mode this course was written to fix.
-
-forjar is unapologetically bare-metal-first and Rust-only. The tradeoffs and
-where the boundary sits are spelled out in Module 1.
-
-## Capstone
-
-The capstone is a **Reading** item in Module 5 of the Coursera course. The
-`capstone/` directory in this repo is a stub. Students extend it with:
-
-- `capstone/forjar.yaml` — composes `de-pipeline-host` with concrete inputs
-  for a real Postgres + nightly-ETL host
-- `capstone/state/forjar.inputs.lock.yaml` — committed pin lock (claim C1)
-- A README documenting the C1/C5 falsifiable-claims framing
-- Two PRs proving the `pin --check` CI gate works (one breaks it, one fixes)
-
-The Coursera reading is the source of truth for the rubric. See
-[`capstone/README.md`](capstone/) for the directory contract.
-
-## Contributing
-
-This repo is a companion artifact for the Coursera course. Substantive content
-changes flow through the course's authoring workflow, not GitHub PRs. Bug
-reports and reproductions of broken-on-clean-clone issues are welcome — open
-an issue with the output of `make validate` and `make verify` and your
-platform.
-
-Local sanity checklist before submitting an issue:
-
-    cargo install forjar --version 1.4.2 --locked
-    make validate     # all five lab solutions + the recipe schema check
-    make verify       # all six fixture diffs match
-    make demo         # lab-01 applies, re-applies cleanly (claim C3)
+`make demo-all` is plan-only by default — it runs `tofu validate` + `tofu plan`
+on every `main.tf` and `forjar plan` on every `forjar.yaml`. No `apply` is
+executed unless you opt in with `make apply-<lesson-id>`.
 
 ## License
 
-MIT. See [`LICENSE`](LICENSE). The forjar tool itself is dual-licensed
-MIT/Apache-2.0 — see https://github.com/paiml/forjar for terms.
+Dual-licensed under MIT or Apache-2.0 — pick the one that fits your downstream
+use. SPDX: `MIT OR Apache-2.0`.

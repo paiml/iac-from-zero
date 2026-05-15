@@ -1,118 +1,143 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 480" width="1280" height="480">
-<!-- HERO — paiml/iac-from-zero README banner.
-     Visual story: forjar.yaml → DAG (plan/apply) → BLAKE3 lock store.
-     Right-edge pillar lists the five labs (one per module). Same
-     oxide-premium chassis as postgres-from-zero / duckdb-from-zero. -->
-
-<defs>
-  <style>
-    .h { font-family: 'Segoe UI', 'Helvetica Neue', sans-serif; }
-    .m { font-family: 'Cascadia Code', 'Fira Code', monospace; }
-    .label { font-family: 'Segoe UI', sans-serif; letter-spacing: 0.12em; }
-  </style>
-
-  <radialGradient id="bg" cx="50%" cy="40%" r="80%">
-    <stop offset="0%" stop-color="#1a2540"/>
-    <stop offset="100%" stop-color="#0e1726"/>
-  </radialGradient>
-  <linearGradient id="accent-strip" x1="0" y1="0" x2="1" y2="0">
-    <stop offset="0%" stop-color="#ff8a4c" stop-opacity="0.85"/>
-    <stop offset="50%" stop-color="#00b8d9" stop-opacity="0.85"/>
-    <stop offset="100%" stop-color="#9c84ff" stop-opacity="0.85"/>
-  </linearGradient>
-  <radialGradient id="zone-yaml" cx="50%" cy="50%" r="50%">
-    <stop offset="0%" stop-color="#ff8a4c" stop-opacity="0.22"/>
-    <stop offset="100%" stop-color="#ff8a4c" stop-opacity="0"/>
-  </radialGradient>
-  <radialGradient id="zone-dag" cx="50%" cy="50%" r="50%">
-    <stop offset="0%" stop-color="#36b37e" stop-opacity="0.20"/>
-    <stop offset="100%" stop-color="#36b37e" stop-opacity="0"/>
-  </radialGradient>
-  <radialGradient id="zone-lock" cx="50%" cy="50%" r="50%">
-    <stop offset="0%" stop-color="#9c84ff" stop-opacity="0.22"/>
-    <stop offset="100%" stop-color="#9c84ff" stop-opacity="0"/>
-  </radialGradient>
-  <marker id="arrow" markerWidth="14" markerHeight="14" refX="12" refY="7" orient="auto" markerUnits="strokeWidth">
-    <path d="M 0 0 L 12 7 L 0 14 Z" fill="#00b8d9"/>
-  </marker>
-</defs>
-
-<rect width="1280" height="480" fill="url(#bg)"/>
-
-<!-- Top accent strip -->
-<rect x="0" y="0" width="1280" height="6" fill="url(#accent-strip)"/>
-
-<!-- Title block — left third -->
-<g class="h">
-  <text x="60" y="92" font-size="44" font-weight="700" fill="#eeeeee">IaC from Zero</text>
-  <text x="60" y="132" font-size="20" fill="#a5d6ff" letter-spacing="0.05em">Rust for Data Engineering · forjar · BLAKE3 lock · Capstone-ready</text>
-  <text x="60" y="162" font-size="14" fill="#ff8a4c" letter-spacing="0.10em" font-weight="700">5 LABS · 10 FALSIFIABLE CLAIMS · 1 RECIPE · 1 CAPSTONE</text>
-</g>
-
-<!-- Stop 1: forjar.yaml at x=240, y=300 -->
-<circle cx="240" cy="300" r="120" fill="url(#zone-yaml)"/>
-<g id="stop-yaml">
-  <rect x="160" y="240" width="160" height="120" rx="8" fill="#0e1726" stroke="#ff8a4c" stroke-width="3"/>
-  <rect x="160" y="240" width="160" height="32" rx="8" fill="#1a1d23" stroke="#ff8a4c" stroke-width="2.5"/>
-  <text x="178" y="262" class="m" font-size="13" font-weight="700" fill="#ffb380">YAML</text>
-  <text x="240" y="295" text-anchor="middle" class="m" font-size="14" font-weight="700" fill="#ffb380">forjar.yaml</text>
-  <text x="240" y="318" text-anchor="middle" class="m" font-size="14" fill="#ffb380">+ recipes/</text>
-  <text x="240" y="356" text-anchor="middle" class="label" font-size="14" font-weight="700" fill="#ff8a4c">DECLARE</text>
-</g>
-
-<!-- Stop 2: DAG plan/apply at x=600, y=300 -->
-<circle cx="600" cy="300" r="120" fill="url(#zone-dag)"/>
-<g id="stop-dag">
-  <rect x="520" y="240" width="160" height="120" rx="8" fill="#0e1726" stroke="#36b37e" stroke-width="3"/>
-  <rect x="520" y="240" width="160" height="32" rx="8" fill="#1a1d23" stroke="#36b37e" stroke-width="2.5"/>
-  <text x="538" y="262" class="m" font-size="13" font-weight="700" fill="#7ee787">DAG</text>
-  <text x="600" y="295" text-anchor="middle" class="m" font-size="14" font-weight="700" fill="#7ee787">plan + apply</text>
-  <text x="600" y="318" text-anchor="middle" class="m" font-size="14" fill="#7ee787">drift detect</text>
-  <text x="600" y="356" text-anchor="middle" class="label" font-size="14" font-weight="700" fill="#36b37e">CONVERGE</text>
-</g>
-
-<!-- Stop 3: BLAKE3 lock at x=960, y=300 -->
-<circle cx="960" cy="300" r="120" fill="url(#zone-lock)"/>
-<g id="stop-lock">
-  <rect x="880" y="240" width="160" height="120" rx="8" fill="#0e1726" stroke="#9c84ff" stroke-width="3.5"/>
-  <rect x="880" y="240" width="160" height="32" rx="8" fill="#1a1d23" stroke="#9c84ff" stroke-width="2.5"/>
-  <text x="898" y="262" class="m" font-size="13" font-weight="700" fill="#9c84ff">LOCK</text>
-  <text x="960" y="295" text-anchor="middle" class="m" font-size="14" font-weight="700" fill="#b8acff">forjar.lock</text>
-  <text x="960" y="318" text-anchor="middle" class="m" font-size="14" fill="#b8acff">BLAKE3 hash</text>
-  <text x="960" y="356" text-anchor="middle" class="label" font-size="14" font-weight="700" fill="#9c84ff">PIN</text>
-</g>
-
-<!-- Arrows between stops -->
-<line x1="330" y1="300" x2="510" y2="300" stroke="#00b8d9" stroke-width="3" marker-end="url(#arrow)"/>
-<line x1="690" y1="300" x2="870" y2="300" stroke="#00b8d9" stroke-width="3" marker-end="url(#arrow)"/>
-
-<!-- Five-labs pillar — right edge -->
-<g id="labs-pillar">
-  <rect x="1100" y="200" width="140" height="200" rx="10" fill="#0e1726" stroke="#7ee787" stroke-width="3"/>
-  <rect x="1100" y="200" width="140" height="36" rx="10" fill="#1f4d3a" stroke="#7ee787" stroke-width="2"/>
-  <text x="1170" y="224" text-anchor="middle" class="h" font-size="15" font-weight="700" fill="#eeeeee">5 labs</text>
-  <line x1="1110" y1="252" x2="1230" y2="252" stroke="#7ee787" stroke-width="1.5" opacity="0.5"/>
-  <text x="1118" y="276" class="m" font-size="13" fill="#a8f0c5">first-yaml</text>
-  <text x="1118" y="298" class="m" font-size="13" fill="#a8f0c5">dag</text>
-  <text x="1118" y="320" class="m" font-size="13" fill="#a8f0c5">drift</text>
-  <text x="1118" y="342" class="m" font-size="13" fill="#a8f0c5">plan-pin</text>
-  <text x="1118" y="364" class="m" font-size="13" fill="#a8f0c5">recipes</text>
-  <text x="1170" y="390" text-anchor="middle" class="label" font-size="11" fill="#7ee787">one per module</text>
-</g>
-
-<!-- Bottom claims strip -->
-<g id="claims-strip">
-  <rect x="60" y="420" width="1160" height="36" rx="6" fill="#161b22" stroke="#7ee787" stroke-width="2" fill-opacity="0.85"/>
-  <text x="80" y="444" class="h" font-size="14" font-weight="700" fill="#7ee787">claims:</text>
-  <text x="160" y="444" class="m" font-size="14" fill="#eeeeee">C1 deterministic hash · C3 idempotency · C5 content-addressed state · C7 typed inputs · C10 jidoka stop</text>
-</g>
-
 <!-- GRID PROTOCOL MANIFEST
-  template: HERO (README banner)
-  canvas: 1280x480
-  zones: yaml@(240,300) | dag@(600,300) | lock@(960,300) | labs-pillar@(1100..1240, 200..400)
-  text_elements: 21
-  palette_colors: [#0e1726, #1a2540, #1a1d23, #161b22, #1f4d3a, #ff8a4c, #ffb380, #a5d6ff, #36b37e, #7ee787, #a8f0c5, #9c84ff, #b8acff, #00b8d9, #eeeeee]
-  bounds_check: all elements within 0,0 → 1280,480
+     Canvas: 1200x600 | text_elements: visible | role: img
+     Zone 1 (0..400): OpenTofu HCL config + tfplan binary
+     Zone 2 (400..800): forjar YAML config + BLAKE3 lock chain
+     Zone 3 (800..1200): converged fleet (primary + canary hosts)
+     Flow: HCL ↔ YAML  →  BLAKE3 lock  →  apply
 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600" width="1200" height="600" role="img" aria-labelledby="hero-title">
+  <title id="hero-title">IAC from Zero — OpenTofu HCL on the left, forjar YAML in the middle, BLAKE3-locked fleet on the right</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#0d1117"/>
+    </linearGradient>
+    <linearGradient id="ember" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff9d1a"/>
+      <stop offset="100%" stop-color="#ffd166"/>
+    </linearGradient>
+    <linearGradient id="rust" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#ff9966"/>
+      <stop offset="100%" stop-color="#78dce8"/>
+    </linearGradient>
+    <linearGradient id="card-dark" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#161b22"/>
+      <stop offset="100%" stop-color="#0a0d12"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="600" fill="url(#bg)"/>
+
+  <!-- top accent rail -->
+  <rect x="80" y="40" width="1040" height="4" rx="2" fill="url(#rust)"/>
+
+  <!-- ============ Zone 1: OpenTofu / HCL ============ -->
+  <g id="zone-opentofu">
+    <rect x="40" y="80" width="340" height="440" rx="14" fill="url(#card-dark)" stroke="#7c3aed" stroke-width="3" stroke-opacity="0.85"/>
+    <rect x="40" y="80" width="340" height="40" rx="14" fill="#7c3aed" fill-opacity="0.9"/>
+    <text x="60" y="108" font-family="'Segoe UI', sans-serif" font-size="20" font-weight="700" fill="#f5f5fa" letter-spacing="0.08em">OPENTOFU</text>
+    <text x="350" y="108" font-family="'Cascadia Code', monospace" font-size="14" fill="#e0d4ff" text-anchor="end">.tf · HCL</text>
+
+    <!-- code lines -->
+    <text x="60" y="150" font-family="'Cascadia Code', monospace" font-size="14" fill="#a5b4fc">resource "null_resource"</text>
+    <text x="60" y="170" font-family="'Cascadia Code', monospace" font-size="14" fill="#f5f5fa">  "web" {</text>
+    <text x="60" y="190" font-family="'Cascadia Code', monospace" font-size="14" fill="#a5b4fc">  lifecycle {</text>
+    <text x="60" y="210" font-family="'Cascadia Code', monospace" font-size="14" fill="#ffd166">    prevent_destroy = true</text>
+    <text x="60" y="230" font-family="'Cascadia Code', monospace" font-size="14" fill="#a5b4fc">  }</text>
+    <text x="60" y="250" font-family="'Cascadia Code', monospace" font-size="14" fill="#f5f5fa">}</text>
+
+    <!-- arrow down to tfplan -->
+    <line x1="210" y1="280" x2="210" y2="320" stroke="#a5b4fc" stroke-width="2"/>
+    <polygon points="210,328 202,312 218,312" fill="#a5b4fc"/>
+
+    <!-- tfplan binary blob -->
+    <rect x="80" y="340" width="260" height="160" rx="10" fill="#0a0d12" stroke="#7c3aed" stroke-width="2.5"/>
+    <text x="100" y="370" font-family="'Cascadia Code', monospace" font-size="14" font-weight="700" fill="#a5b4fc">plan.tfplan</text>
+    <text x="100" y="394" font-family="'Cascadia Code', monospace" font-size="11" fill="#7d8590">7f 8b 08 00 a9 e0 1c 67</text>
+    <text x="100" y="412" font-family="'Cascadia Code', monospace" font-size="11" fill="#7d8590">02 ff 84 5d 6f 9b 30 14</text>
+    <text x="100" y="430" font-family="'Cascadia Code', monospace" font-size="11" fill="#7d8590">fd cb d7 13 d7 e9 b6 49</text>
+    <text x="100" y="448" font-family="'Cascadia Code', monospace" font-size="11" fill="#7d8590">53 c9 80 8a a8 28 1a 09</text>
+    <text x="100" y="476" font-family="'Segoe UI', sans-serif" font-size="11" font-style="italic" fill="#7c3aed">opaque · binary · gzip</text>
+  </g>
+
+  <!-- ============ Zone 2: forjar / YAML ============ -->
+  <g id="zone-forjar">
+    <rect x="430" y="80" width="340" height="440" rx="14" fill="url(#card-dark)" stroke="#ff9d1a" stroke-width="3"/>
+    <rect x="430" y="80" width="340" height="40" rx="14" fill="#ff9d1a" fill-opacity="0.92"/>
+    <text x="450" y="108" font-family="'Segoe UI', sans-serif" font-size="20" font-weight="700" fill="#161b22" letter-spacing="0.08em">FORJAR</text>
+    <text x="740" y="108" font-family="'Cascadia Code', monospace" font-size="14" fill="#161b22" text-anchor="end">forjar.yaml</text>
+
+    <!-- yaml lines -->
+    <text x="450" y="150" font-family="'Cascadia Code', monospace" font-size="14" fill="#ff9d1a">resources:</text>
+    <text x="450" y="170" font-family="'Cascadia Code', monospace" font-size="14" fill="#ffd166">  web:</text>
+    <text x="450" y="190" font-family="'Cascadia Code', monospace" font-size="14" fill="#f5f5fa">    type: package</text>
+    <text x="450" y="210" font-family="'Cascadia Code', monospace" font-size="14" fill="#f5f5fa">    name: nginx</text>
+    <text x="450" y="230" font-family="'Cascadia Code', monospace" font-size="14" fill="#f5f5fa">    state: present</text>
+    <text x="450" y="250" font-family="'Cascadia Code', monospace" font-size="14" fill="#7ee787">    # idempotent ✓</text>
+
+    <!-- arrow down to lock -->
+    <line x1="600" y1="280" x2="600" y2="320" stroke="#ff9d1a" stroke-width="2"/>
+    <polygon points="600,328 592,312 608,312" fill="#ff9d1a"/>
+
+    <!-- BLAKE3 lock chain -->
+    <rect x="470" y="340" width="260" height="160" rx="10" fill="#0a0d12" stroke="#ff9d1a" stroke-width="2.5"/>
+    <text x="490" y="370" font-family="'Cascadia Code', monospace" font-size="14" font-weight="700" fill="#ff9d1a">forjar.lock</text>
+    <text x="490" y="394" font-family="'Cascadia Code', monospace" font-size="11" fill="#a9dc76">- name: web</text>
+    <text x="490" y="412" font-family="'Cascadia Code', monospace" font-size="11" fill="#a9dc76">  hash: blake3:c4f3b1a8…</text>
+    <text x="490" y="430" font-family="'Cascadia Code', monospace" font-size="11" fill="#a9dc76">- name: lifecycle</text>
+    <text x="490" y="448" font-family="'Cascadia Code', monospace" font-size="11" fill="#a9dc76">  hash: blake3:9d2e7f04…</text>
+    <text x="490" y="476" font-family="'Segoe UI', sans-serif" font-size="11" font-style="italic" fill="#ff9d1a">readable · YAML · git-tracked</text>
+  </g>
+
+  <!-- ============ Arrow between zones (HCL ↔ YAML) ============ -->
+  <g id="vs-arrow">
+    <line x1="395" y1="290" x2="425" y2="290" stroke="#f5f5fa" stroke-width="2"/>
+    <polygon points="395,290 405,284 405,296" fill="#f5f5fa"/>
+    <polygon points="425,290 415,284 415,296" fill="#f5f5fa"/>
+    <rect x="386" y="262" width="48" height="22" rx="11" fill="#0d1117" stroke="#f5f5fa" stroke-width="1.5"/>
+    <text x="410" y="278" font-family="'Segoe UI', sans-serif" font-size="13" font-weight="700" fill="#f5f5fa" text-anchor="middle">vs</text>
+  </g>
+
+  <!-- ============ Zone 3: converged fleet ============ -->
+  <g id="zone-fleet">
+    <rect x="820" y="80" width="340" height="440" rx="14" fill="url(#card-dark)" stroke="#36b37e" stroke-width="3"/>
+    <rect x="820" y="80" width="340" height="40" rx="14" fill="#36b37e" fill-opacity="0.92"/>
+    <text x="840" y="108" font-family="'Segoe UI', sans-serif" font-size="20" font-weight="700" fill="#0e0e1a" letter-spacing="0.08em">APPLIED</text>
+    <text x="1140" y="108" font-family="'Cascadia Code', monospace" font-size="14" fill="#0e0e1a" text-anchor="end">canary fleet</text>
+
+    <!-- primary host -->
+    <rect x="850" y="150" width="280" height="100" rx="10" fill="#0a0d12" stroke="#36b37e" stroke-width="2.5"/>
+    <circle cx="880" cy="200" r="18" fill="#36b37e" fill-opacity="0.9"/>
+    <text x="880" y="207" font-family="'Segoe UI', sans-serif" font-size="14" font-weight="700" fill="#0e0e1a" text-anchor="middle">P</text>
+    <text x="910" y="186" font-family="'Cascadia Code', monospace" font-size="14" font-weight="700" fill="#7ee787">primary</text>
+    <text x="910" y="208" font-family="'Cascadia Code', monospace" font-size="12" fill="#a0a8c0">10.0.0.10</text>
+    <text x="910" y="226" font-family="'Cascadia Code', monospace" font-size="12" fill="#a0a8c0">nginx · healthy</text>
+    <rect x="1080" y="180" width="36" height="20" rx="6" fill="#36b37e" fill-opacity="0.4" stroke="#36b37e" stroke-width="1.5"/>
+    <text x="1098" y="195" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="700" fill="#7ee787" text-anchor="middle">✓</text>
+
+    <!-- canary host -->
+    <rect x="850" y="270" width="280" height="100" rx="10" fill="#0a0d12" stroke="#ffd166" stroke-width="2.5"/>
+    <circle cx="880" cy="320" r="18" fill="#ffd166" fill-opacity="0.9"/>
+    <text x="880" y="327" font-family="'Segoe UI', sans-serif" font-size="14" font-weight="700" fill="#0e0e1a" text-anchor="middle">C</text>
+    <text x="910" y="306" font-family="'Cascadia Code', monospace" font-size="14" font-weight="700" fill="#ffd166">canary</text>
+    <text x="910" y="328" font-family="'Cascadia Code', monospace" font-size="12" fill="#a0a8c0">10.0.0.11</text>
+    <text x="910" y="346" font-family="'Cascadia Code', monospace" font-size="12" fill="#a0a8c0">nginx · healthy</text>
+    <rect x="1080" y="300" width="36" height="20" rx="6" fill="#ffd166" fill-opacity="0.4" stroke="#ffd166" stroke-width="1.5"/>
+    <text x="1098" y="315" font-family="'Segoe UI', sans-serif" font-size="11" font-weight="700" fill="#ffd166" text-anchor="middle">✓</text>
+
+    <!-- 10 claims -->
+    <rect x="850" y="390" width="280" height="110" rx="10" fill="#0a0d12" stroke="#36b37e" stroke-width="2"/>
+    <text x="870" y="416" font-family="'Segoe UI', sans-serif" font-size="14" font-weight="700" fill="#36b37e" letter-spacing="0.06em">10 FORJAR CLAIMS</text>
+    <text x="870" y="438" font-family="'Cascadia Code', monospace" font-size="12" fill="#7ee787">C1 deterministic    ✓</text>
+    <text x="870" y="456" font-family="'Cascadia Code', monospace" font-size="12" fill="#7ee787">C4 idempotent       ✓</text>
+    <text x="870" y="474" font-family="'Cascadia Code', monospace" font-size="12" fill="#7ee787">C7 cycle-free DAG   ✓</text>
+    <text x="1040" y="438" font-family="'Cascadia Code', monospace" font-size="12" fill="#7ee787">… 7 more</text>
+    <text x="870" y="495" font-family="'Segoe UI', sans-serif" font-size="11" font-style="italic" fill="#36b37e">live-asserted on every apply</text>
+  </g>
+
+  <!-- ============ Bottom caption ============ -->
+  <text x="600" y="565" font-family="'Segoe UI', sans-serif" font-size="18" font-weight="600" fill="#a0a8c0" text-anchor="middle">10 OpenTofu features &#8226; 10 forjar equivalents &#8226; 12 runnable demos</text>
 </svg>
