@@ -1,66 +1,117 @@
-.PHONY: help validate plan apply lab1 lab2 lab3 lab4 lab5 demo verify clean
+# IAC from Zero — companion repo Makefile
+#
+# Every demo target runs the full forjar lifecycle that's safe on the
+# studio box (validate + plan + plan --json). `make apply-<id>` opts
+# into a real apply, which most demos pin to container transport so they
+# require Docker on PATH.
+#
+# Run `make demo-all` for the CI gate.
 
-FORJAR := forjar
-LABS := lab-01-first-yaml lab-02-dag lab-03-drift lab-04-plan-pin lab-05-recipes
+SHELL := /usr/bin/env bash
+.SHELLFLAGS := -eu -o pipefail -c
+
+FORJAR ?= forjar
+DEMOS := \
+	m1-first-apply \
+	m2-state-and-plan/2.1.2-saved-plan \
+	m2-state-and-plan/2.1.3-json-plan \
+	m3-lifecycle/3.1.1-lifecycle \
+	m3-lifecycle/3.1.2-moved-blocks \
+	m3-lifecycle/3.1.3-resource-targeting \
+	m4-drift/4.1.1-refresh-only \
+	m4-drift/4.1.2-check-blocks \
+	m4-drift/4.1.3-cross-config \
+	m5-testing-security/5.1.1-testing-dsl \
+	m5-testing-security/5.1.2-state-encryption \
+	m5-testing-security/5.1.3-capstone-canary-fleet
+
+.PHONY: help install demo-all validate plan plan-json fmt lint clean
 
 help:
-	@echo "IaC From Zero — companion repo"
+	@echo "IAC from Zero — companion repo"
 	@echo ""
-	@echo "  make validate  — forjar validate every lab solution + the recipe"
-	@echo "  make plan      — forjar plan every lab solution (no apply)"
-	@echo "  make demo      — apply lab-01-first-yaml then re-apply (claim C3)"
-	@echo "  make verify    — diff each lab's status against expected-status.json"
-	@echo "  make lab1 .. lab5 — apply a specific lab's solution config"
-	@echo "  make clean     — remove ephemeral state under labs/*/solution/state/"
+	@echo "Top-level targets:"
+	@echo "  make install     install forjar from crates.io (cargo install forjar)"
+	@echo "  make demo-all    run validate + plan + plan-json across all 12 demos (CI gate)"
+	@echo "  make validate    forjar validate every demo"
+	@echo "  make plan        forjar plan every demo"
+	@echo "  make plan-json   forjar plan --json every demo (CI/CD policy gate format)"
+	@echo "  make fmt         forjar fmt every demo (write changes)"
+	@echo "  make lint        forjar lint every demo (read-only)"
+	@echo "  make clean       remove state/ + .forjar/ + temp plan files"
+	@echo ""
+	@echo "Per-demo targets (one per directory):"
+	@for d in $(DEMOS); do echo "  make demo-$$d"; done
+
+install:
+	cargo install forjar --locked
+
+# ---- per-demo recipes ----
+# `demo-<dir>` runs validate → plan → plan-json on one directory.
+# Output is grouped so a CI failure points at the right demo.
+
+define DEMO_template
+.PHONY: demo-$(1)
+demo-$(1):
+	@printf '\n\033[1;36m=== demo-$(1) ===\033[0m\n'
+	@cd $(1) && $(FORJAR) validate -f forjar.yaml
+	@cd $(1) && $(FORJAR) plan     -f forjar.yaml --no-color > /tmp/plan-$$(echo "$(1)" | tr '/' '-').txt
+	@cd $(1) && $(FORJAR) plan     -f forjar.yaml --json > /tmp/plan-$$(echo "$(1)" | tr '/' '-').json
+	@printf '\033[1;32m✓ demo-$(1)\033[0m  validate + plan + plan-json clean\n'
+endef
+
+$(foreach d,$(DEMOS),$(eval $(call DEMO_template,$(d))))
+
+# ---- aggregate gates ----
+
+demo-all: $(addprefix demo-,$(DEMOS))
+	@printf '\n\033[1;32m=== ALL 12 DEMOS PASSED ===\033[0m\n'
 
 validate:
-	@for lab in lab-01-first-yaml lab-02-dag lab-03-drift lab-04-plan-pin; do \
-		echo "=== validate $$lab ==="; \
-		$(FORJAR) validate -f labs/$$lab/solution/forjar.yaml || exit 1; \
+	@for d in $(DEMOS); do \
+	  printf '  validate %s ... ' $$d; \
+	  (cd $$d && $(FORJAR) validate -f forjar.yaml >/dev/null) && echo OK || { echo FAIL; exit 1; }; \
 	done
-	@echo "=== validate lab-05-recipes (de-dev + de-staging) ==="
-	@$(FORJAR) validate -f labs/lab-05-recipes/solution/de-dev.yaml
-	@$(FORJAR) validate -f labs/lab-05-recipes/solution/de-staging.yaml
 
 plan:
-	@for lab in lab-01-first-yaml lab-02-dag lab-03-drift lab-04-plan-pin; do \
-		echo "=== plan $$lab ==="; \
-		$(FORJAR) plan -f labs/$$lab/solution/forjar.yaml \
-		  --state-dir labs/$$lab/solution/state || exit 1; \
+	@for d in $(DEMOS); do \
+	  printf '\n=== plan %s ===\n' $$d; \
+	  (cd $$d && $(FORJAR) plan -f forjar.yaml --no-color); \
 	done
-	@echo "=== plan lab-05-recipes (de-dev + de-staging) ==="
-	@$(FORJAR) plan -f labs/lab-05-recipes/solution/de-dev.yaml \
-	  --state-dir labs/lab-05-recipes/solution/state
-	@$(FORJAR) plan -f labs/lab-05-recipes/solution/de-staging.yaml \
-	  --state-dir labs/lab-05-recipes/solution/state
 
-demo: lab1
+plan-json:
+	@for d in $(DEMOS); do \
+	  printf '  plan --json %s ... ' $$d; \
+	  (cd $$d && $(FORJAR) plan -f forjar.yaml --json >/dev/null) && echo OK || { echo FAIL; exit 1; }; \
+	done
 
-lab1:
-	@cd labs/lab-01-first-yaml/solution && $(FORJAR) apply -f forjar.yaml
-	@echo ""
-	@echo "--- second apply (claim C3: idempotent — expect 0 changes) ---"
-	@cd labs/lab-01-first-yaml/solution && $(FORJAR) apply -f forjar.yaml
+fmt:
+	@for d in $(DEMOS); do \
+	  (cd $$d && $(FORJAR) fmt -f forjar.yaml) || true; \
+	done
 
-lab2:
-	@cd labs/lab-02-dag/solution && $(FORJAR) plan -f forjar.yaml --json | jq '.execution_order'
+lint:
+	@for d in $(DEMOS); do \
+	  printf '  lint %s\n' $$d; \
+	  (cd $$d && $(FORJAR) lint -f forjar.yaml --no-color) || true; \
+	done
 
-lab3:
-	@cd labs/lab-03-drift/solution && $(FORJAR) drift -f forjar.yaml || true
+# ---- opt-in apply targets (require Docker) ----
+# `make apply-<dir>` actually converges the demo's container target.
+# Not part of demo-all; opt-in only.
 
-lab4:
-	@cd labs/lab-04-plan-pin/solution && $(FORJAR) pin -f forjar.yaml
+define APPLY_template
+.PHONY: apply-$(1)
+apply-$(1):
+	@printf '\n\033[1;33m=== apply-$(1) (this converges a real container) ===\033[0m\n'
+	@cd $(1) && $(FORJAR) apply -f forjar.yaml --no-color
+endef
 
-lab5:
-	@cd labs/lab-05-recipes/solution && $(FORJAR) plan -f de-dev.yaml --json | jq '.changes | length'
-	@cd labs/lab-05-recipes/solution && $(FORJAR) plan -f de-staging.yaml --json | jq '.changes | length'
-
-verify:
-	@bash scripts/verify-fixtures.sh
+$(foreach d,$(DEMOS),$(eval $(call APPLY_template,$(d))))
 
 clean:
-	@for lab in $(LABS); do \
-		rm -rf labs/$$lab/solution/state/forjar.lock.yaml \
-		       labs/$$lab/solution/state/events; \
+	@for d in $(DEMOS); do \
+	  rm -rf $$d/state $$d/.forjar; \
 	done
-	@echo "ephemeral state removed (lock files kept where committed)"
+	@rm -f /tmp/plan-*.txt /tmp/plan-*.json
+	@echo "cleaned state/, .forjar/, /tmp/plan-*.{txt,json}"

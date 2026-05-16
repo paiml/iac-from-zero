@@ -1,0 +1,8 @@
+# Shared policy defaults for forjar-cookbook recipes
+# Included by all recipes for consistent failure handling and observability
+version: '1.0'
+name: policy-defaults
+
+params:
+  forjar_managed: "true"
+  forjar_version: "1.0"

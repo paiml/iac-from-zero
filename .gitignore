@@ -1,19 +1,34 @@
-# forjar's state/ tree is ephemeral apply output. Lock files are
-# regenerated on first `forjar apply`; the rest is per-run logs and
-# trace data. Nothing under state/ is committed.
+# forjar state — ephemeral apply output
 **/state/
+state/
+*.lock
+.forjar/
 
-# /tmp is where the labs converge (so the repo working tree stays
-# clean after make demo / make verify). Never commit it.
+# /tmp convergence target for labs
 /tmp/
 
 # Local pmat / pv tooling state
 /.pmat/
 /.pmat-metrics/
 /.pv/
+.pmat/context.db
+.pmat/context.db-shm
+.pmat/context.db-wal
+.pmat/context.idx/
 
-# Build artifacts (no Rust crate yet, but reserved)
+# Rust (none expected, but defensive)
 /target/
+target/
+**/*.rs.bk
 
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan
+.terraform.lock.hcl
+
+# OS
 .env
 .DS_Store
+*.swp
