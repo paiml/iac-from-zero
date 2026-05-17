@@ -58,11 +58,11 @@ install:
 
 define DEMO_template
 demo-$(1):
-	@mkdir -p $(TMPDIR)
+	@mkdir -p "$(TMPDIR)"
 	@printf '\n\033[1;36m=== demo-$(1) ===\033[0m\n'
-	@cd $(1) && $(FORJAR) validate -f forjar.yaml
-	@cd $(1) && $(FORJAR) plan     -f forjar.yaml --no-color > $(CURDIR)/$(TMPDIR)/plan-$$(echo "$(1)" | tr '/' '-').txt
-	@cd $(1) && $(FORJAR) plan     -f forjar.yaml --json     > $(CURDIR)/$(TMPDIR)/plan-$$(echo "$(1)" | tr '/' '-').json
+	@( cd "$(1)" && $(FORJAR) validate -f forjar.yaml )
+	@( cd "$(1)" && $(FORJAR) plan     -f forjar.yaml --no-color ) > "$(CURDIR)/$(TMPDIR)/plan-$$(echo '$(1)' | tr '/' '-').txt"
+	@( cd "$(1)" && $(FORJAR) plan     -f forjar.yaml --json )     > "$(CURDIR)/$(TMPDIR)/plan-$$(echo '$(1)' | tr '/' '-').json"
 	@printf '\033[1;32m✓ demo-$(1)\033[0m  validate + plan + plan-json clean\n'
 endef
 
@@ -120,7 +120,7 @@ lint:
 define APPLY_template
 apply-$(1):
 	@printf '\n\033[1;33m=== apply-$(1) (this converges a real container) ===\033[0m\n'
-	@cd $(1) && $(FORJAR) apply -f forjar.yaml --no-color
+	@( cd "$(1)" && $(FORJAR) apply -f forjar.yaml --no-color )
 endef
 
 $(foreach d,$(DEMOS),$(eval $(call APPLY_template,$(d))))
