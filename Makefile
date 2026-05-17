@@ -39,10 +39,14 @@ DEMOS := \
 	m5-testing-security/5.1.3-capstone-canary-fleet
 
 .PHONY: help install demo-all validate plan plan-json fmt lint clean
-.PHONY: tofu-validate tofu-fmt verify
+.PHONY: tofu-validate tofu-fmt verify hello hello-clean
 
 help:
 	@echo "IAC from Zero — companion repo"
+	@echo ""
+	@echo "Hello-world (30-second first impression):"
+	@echo "  make hello          apply → vandalize → drift → apply-force → restore"
+	@echo "                      exercises C1 + C3 + C5 + C10 contracts"
 	@echo ""
 	@echo "Top-level targets (forjar side):"
 	@echo "  make install        install forjar from crates.io"
@@ -140,13 +144,13 @@ endef
 
 $(foreach d,$(DEMOS),$(eval $(call APPLY_template,$(d))))
 
-clean:
+clean: hello-clean
 	@for d in $(DEMOS); do \
 	  rm -rf "$$d/state" "$$d/.forjar" "$$d/.terraform" || exit 1; \
 	  rm -f  "$$d/.terraform.lock.hcl" || exit 1; \
 	done
 	@rm -rf "$(TMPDIR)"
-	@echo "cleaned state/, .forjar/, .terraform/, $(TMPDIR)/"
+	@echo "cleaned state/, .forjar/, .terraform/, $(TMPDIR)/, hello/world+state/"
 
 # ---- OpenTofu / Terraform validation gate ----
 # `tofu init -backend=false` downloads providers without connecting to
@@ -179,3 +183,36 @@ tofu-fmt:
 
 verify:
 	@bash scripts/verify-fixtures.sh
+
+# ---- Hello world ----
+# 30-second demo that exercises the heart of forjar's contract bundle:
+#   1. forjar apply               → file created from desired state
+#   2. forjar apply (again)       → 0 converged, 2 unchanged   (C3 idempotent apply)
+#   3. echo BROKEN > file         → simulate sysadmin tampering
+#   4. forjar drift               → reports BLAKE3 hash mismatch (C1 + C5)
+#   5. forjar apply (no --force)  → BLOCKED by drift gate        (C10 jidoka)
+#   6. forjar apply --force       → file restored bit-for-bit
+# Per-step state lands in hello/state/ + hello/world/, both gitignored.
+
+hello: hello-clean
+	@printf '\n\033[1;36m═══ HELLO FORJAR — watch it heal ═══\033[0m\n\n'
+	@printf '\033[1;33m[1/6]\033[0m forjar apply (create world.txt)\n'
+	@( cd hello && $(FORJAR) apply -f forjar.yaml --yes --no-color | tail -3 )
+	@printf '\n\033[1;33m[2/6]\033[0m forjar apply AGAIN — expect 0 converged, 2 unchanged (C3 idempotent)\n'
+	@( cd hello && $(FORJAR) apply -f forjar.yaml --yes --no-color | tail -3 )
+	@printf '\n\033[1;33m[3/6]\033[0m vandalize: echo BROKEN > hello/world/world.txt\n'
+	@echo BROKEN > hello/world/world.txt
+	@printf '         hello/world/world.txt now: '
+	@head -1 hello/world/world.txt
+	@printf '\n\033[1;33m[4/6]\033[0m forjar drift — BLAKE3 hash mismatch (C1 deterministic hash + C5 content-addressed)\n'
+	@( cd hello && $(FORJAR) drift -f forjar.yaml --no-color | head -8 ) || true
+	@printf '\n\033[1;33m[5/6]\033[0m forjar apply without --force — REFUSED (C10 jidoka: drift blocks apply)\n'
+	@( cd hello && $(FORJAR) apply -f forjar.yaml --yes --no-color 2>&1 | tail -3 ) || true
+	@printf '\n\033[1;33m[6/6]\033[0m forjar apply --force — heals from desired state\n'
+	@( cd hello && $(FORJAR) apply -f forjar.yaml --yes --force --no-color | tail -3 )
+	@printf '         hello/world/world.txt now: '
+	@head -1 hello/world/world.txt
+	@printf '\n\033[1;32m✓ HEALED — contracts C1, C3, C5, C10 all exercised in one make target\033[0m\n'
+
+hello-clean:
+	@rm -rf hello/world hello/state hello/forjar.lock.yaml hello/forjar.lock.yaml.b3
