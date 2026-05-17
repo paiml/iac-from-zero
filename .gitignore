@@ -32,3 +32,6 @@ target/
 .env
 .DS_Store
 *.swp
+
+# Repo-local plan output (Makefile TMPDIR)
+.tmp/
