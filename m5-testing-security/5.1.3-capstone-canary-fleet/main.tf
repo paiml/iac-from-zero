@@ -20,7 +20,7 @@
 terraform {
   required_version = ">= 1.5.0"
   required_providers {
-    null  = { source = "hashicorp/null",  version = "~> 3.2" }
+    null  = { source = "hashicorp/null", version = "~> 3.2" }
     local = { source = "hashicorp/local", version = "~> 2.5" }
   }
 }
@@ -102,7 +102,7 @@ resource "local_file" "health_gate" {
     done
     echo "Health gate PASSED — $SLOT healthy"
   EOT
-  depends_on = [null_resource.canary_green]
+  depends_on      = [null_resource.canary_green]
 }
 
 # ── Traffic switch script ──
@@ -118,7 +118,7 @@ resource "local_file" "traffic_switch" {
     nginx -t && nginx -s reload
     echo "Traffic switched to $SLOT"
   EOT
-  depends_on = [local_file.health_gate]
+  depends_on      = [local_file.health_gate]
 }
 
 # Forjar parity: this output enumerates what the recipe-94 outputs block
@@ -126,10 +126,10 @@ resource "local_file" "traffic_switch" {
 # against the live fleet on every apply.
 output "fleet_summary" {
   value = {
-    app_name      = var.app_name
-    blue_endpoint = "http://127.0.0.1:${var.blue_port}"
+    app_name       = var.app_name
+    blue_endpoint  = "http://127.0.0.1:${var.blue_port}"
     green_endpoint = "http://127.0.0.1:${var.green_port}"
-    health_gate   = local_file.health_gate.filename
+    health_gate    = local_file.health_gate.filename
     traffic_switch = local_file.traffic_switch.filename
   }
   description = "Canary fleet endpoints + helper scripts (forjar parity: outputs + 10 C-claims)"

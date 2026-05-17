@@ -11,6 +11,10 @@ env:
   RUST_BACKTRACE: 1
 
 jobs:
+  # The `m1-…m5-` side-by-side demo gate. Installs both toolchains
+  # (forjar from crates.io + OpenTofu from official release) and runs
+  # both halves of the lesson: forjar plan + tofu validate.
+  # Sister workflow `iac.yml` gates `labs/` separately.
   demo-all:
     name: forjar demo gate
     runs-on: ubuntu-latest
@@ -37,8 +41,19 @@ jobs:
           fi
           forjar --version
 
-      - name: make demo-all
+      - name: Install OpenTofu
+        uses: opentofu/setup-opentofu@v1
+        with:
+          tofu_version: "1.8.5"
+
+      - name: make demo-all (forjar half)
         run: make demo-all
+
+      - name: make tofu-validate (OpenTofu half)
+        run: make tofu-validate
+
+      - name: make tofu-fmt (formatting gate)
+        run: make tofu-fmt
 
   shellcheck:
     name: shellcheck Makefile shell snippets

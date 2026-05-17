@@ -25,7 +25,7 @@ terraform {
   required_version = ">= 1.5.0"
   required_providers {
     local = { source = "hashicorp/local", version = "~> 2.5" }
-    null  = { source = "hashicorp/null",  version = "~> 3.2" }
+    null  = { source = "hashicorp/null", version = "~> 3.2" }
   }
 }
 
@@ -42,7 +42,7 @@ resource "null_resource" "web_packages" {
 resource "local_file" "web_config" {
   filename        = "/tmp/forjar-demo/etc/web/config.json"
   file_permission = "0644"
-  content         = jsonencode({
+  content = jsonencode({
     server  = "web-stack"
     port    = 8080
     workers = 4

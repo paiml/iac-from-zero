@@ -17,7 +17,7 @@
 terraform {
   required_version = ">= 1.5.0"
   required_providers {
-    null  = { source = "hashicorp/null",  version = "~> 3.2" }
+    null  = { source = "hashicorp/null", version = "~> 3.2" }
     local = { source = "hashicorp/local", version = "~> 2.5" }
   }
 }
@@ -45,7 +45,7 @@ resource "local_file" "app_config" {
     version: 1.0
     port: 8080
   EOT
-  depends_on = [null_resource.app_data_dir]
+  depends_on      = [null_resource.app_data_dir]
 }
 
 # Forjar parity: outputs are flat key/value/description tuples.

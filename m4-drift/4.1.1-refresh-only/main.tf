@@ -20,7 +20,7 @@ terraform {
   required_version = ">= 1.5.0"
   required_providers {
     local = { source = "hashicorp/local", version = "~> 2.5" }
-    null  = { source = "hashicorp/null",  version = "~> 3.2" }
+    null  = { source = "hashicorp/null", version = "~> 3.2" }
   }
 }
 
@@ -60,7 +60,7 @@ resource "local_file" "drift_check_script" {
     echo "Note: -refresh-only mode never applies changes."
     echo "Forjar parity: 'forjar plan' uses BLAKE3 hash compare instead."
   EOT
-  depends_on = [local_file.app_config]
+  depends_on      = [local_file.app_config]
 }
 
 output "mode" {

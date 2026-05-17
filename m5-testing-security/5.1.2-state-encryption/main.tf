@@ -15,7 +15,7 @@
 #   tofu init && tofu plan && tofu apply
 
 terraform {
-  required_version = ">= 1.7.0"   # OpenTofu 1.7+ for the encryption block
+  required_version = ">= 1.7.0" # OpenTofu 1.7+ for the encryption block
 
   # OpenTofu 1.7+ state encryption block. The top-level `encryption {}`
   # block declares the key provider and the encryption method, then
