@@ -35,3 +35,12 @@ target/
 
 # Repo-local plan output (Makefile TMPDIR)
 .tmp/
+
+# hello-world demo state (created by `make hello`)
+hello/world/
+hello/state/
+hello/forjar.lock.yaml
+hello/forjar.lock.yaml.b3
+
+# IDE state
+.idea/

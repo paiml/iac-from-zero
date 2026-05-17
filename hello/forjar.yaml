@@ -1,0 +1,42 @@
+version: "1.0"
+name: hello-forjar
+description: "Hello-world for forjar — one file managed declaratively. Watch it heal."
+
+params:
+  # Path is relative to forjar's CWD at apply time. The Makefile target `make hello`
+  # `cd`s into this directory first, so the file lands at `hello/world/world.txt`
+  # next to this YAML. Override with --param hello_dir=/abs/path for a different
+  # location.
+  hello_dir: "world"
+  greeting: "hello, forjar"
+
+machines:
+  localhost:
+    hostname: localhost
+    addr: 127.0.0.1
+
+resources:
+  # The whole point of this demo: ONE file. Forjar declares it; you can vandalize it; the
+  # next `forjar apply` restores it BIT-FOR-BIT from the lock hash. That is the entire
+  # "declarative IaC" thesis in three commands.
+  hello-dir:
+    type: file
+    machine: localhost
+    path: "{{params.hello_dir}}"
+    state: directory
+    mode: "0755"
+    tags: [hello, file]
+
+  greeting-file:
+    type: file
+    machine: localhost
+    path: "{{params.hello_dir}}/world.txt"
+    state: file
+    content: |
+      {{params.greeting}}
+      This file is managed by forjar. Edit by hand and the next `forjar apply` will
+      restore the content from the BLAKE3 lock — the same C1 + C3 + C5 contracts the
+      rest of the course rests on.
+    mode: "0644"
+    depends_on: [hello-dir]
+    tags: [hello, file]

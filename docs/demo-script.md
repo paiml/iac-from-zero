@@ -1,53 +1,65 @@
-# Script — Capstone: Canary Deployment Fleet
+# Script — Hello, forjar: watch it heal
 
-**Lesson:** 5.1.3-capstone-canary-fleet
-**Visual reference:** terminal screencast — one repo (`paiml/iac-from-zero`), one canary fleet, ten falsifiable claims.
-**Target length:** ~3 min.
+**Lesson:** the 30-second first impression of declarative IaC.
+**Visual reference:** terminal screencast — one repo (`paiml/iac-from-zero`), one file, four contracts (C1, C3, C5, C10).
+**Target length:** ~2 min.
 
-## Demo (one terminal, one Makefile — `paiml/iac-from-zero`)
+## Demo (one terminal, one file — `hello/forjar.yaml`)
 
 ```bash
 cd ~/src/iac-from-zero
 ```
 
 ```bash
-wc -l m5-testing-security/5.1.3-capstone-canary-fleet/{forjar.yaml,main.tf}
+cat hello/forjar.yaml
 ```
-**The diff IS the lesson.** ~200 lines of YAML next to ~140 lines of HCL — same canary topology, two DSLs, side-by-side.
+**The spec.** Two resources — one directory, one file. The file's `content:` block is the desired state. Nothing else exists.
 
 ```bash
-make demo-m5-testing-security/5.1.3-capstone-canary-fleet
+cd hello && forjar apply -f forjar.yaml --yes
 ```
-**Forjar validate + plan + plan-json, one command.** No hosts touched.
+**2 converged.** Directory and file created from the spec. State written to `state/forjar.lock.yaml` as a BLAKE3 hash of the desired content.
 
 ```bash
-jq -r '.execution_order[]' .tmp/plan-m5-testing-security-5.1.3-capstone-canary-fleet.json
+forjar apply -f forjar.yaml --yes
 ```
-**Seven-resource DAG.** `deploy-dir → blue-config → green-config → nginx-backend → health-gate → traffic-switch → rollback-script`. Same input always yields this order — claim **C2 (deterministic DAG)**.
+**0 converged, 2 unchanged.** The lock hash matches the live file — second apply is a no-op. Claim **C3 (idempotent apply)**.
 
 ```bash
-make tofu-validate
+echo BROKEN > world/world.txt
 ```
-**OpenTofu half passes too.** Same canary topology in HCL — no cloud creds, no `apply`, just the static-analysis gate across all 12 demos.
+**Vandalize.** A sysadmin SSH'd in and edited the file by hand. The classic IaC nightmare.
 
 ```bash
-make verify
+forjar drift -f forjar.yaml
 ```
-**Six committed lab fixtures, all match.** `forjar status --json` against the snapshot the course was authored against — claim **C1 (deterministic hashing)** and **C5 (content-addressed state)** asserted live.
+**DRIFTED — Expected blake3:4c1c… / Actual blake3:9c51…**. Hash of desired vs hash of actual — claim **C1 (deterministic hashing)** + **C5 (content-addressed state)**. No cloud API poll, no metadata read — a single local hash compare.
 
 ```bash
-make demo-all
+forjar apply -f forjar.yaml --yes
 ```
-**Twelve demos, under a second.** Same command CI runs. Local box and `green main` agree byte-for-byte.
+**REFUSED. `error: 1 drift finding(s) block apply — use --force to override`.** Claim **C10 (jidoka)**: first failure stops execution. Forjar will not silently overwrite human edits.
+
+```bash
+forjar apply -f forjar.yaml --yes --force
+```
+**2 converged. File restored bit-for-bit.** The BLAKE3 hash from the lock is the source of truth; `--force` is the explicit "yes, I meant it" override.
 
 ## Close
 
-The canary fleet is the lesson; the gate is the proof. Same Makefile, same JSON, same C1–C10 contracts — local box, CI runner, production cluster.
+One file, four contracts, ten seconds. The other 12 `m1-…m5-` demos are yours to explore — same Makefile, same gates, same claims, scaled up to canary fleets.
 
 ## Speaking notes
 
-- Pace ~140 wpm. Let the green "ALL 12 DEMOS PASSED" hold for a beat.
-- Pronunciation: forjar = "for-HAR" (Spanish, "to forge"); BLAKE3 = "blake three"; jidoka = "jee-DOH-ka"; OpenTofu = "open-TOH-foo".
-- Do NOT `apply` on stream — recipe 94 wants Docker + bound ports. `make demo-all` is plan-only by design: every claim is asserted before any host is touched.
-- C3 (idempotent apply) is NOT demonstrated by `make demo-all` alone (no apply runs). If you want to show C3, opt in to `make apply-m5-...` on a Docker host, then re-apply — `actual_changes=0 forced_noop_count=7` is the C3 read-out (forjar 1.4.2+).
-- Land the close on the green banner. No extra terminal output after it.
+- Pace ~140 wpm. Let `BROKEN` linger on screen for a beat before running `forjar drift`.
+- Pronunciation: forjar = "for-HAR" (Spanish, "to forge"); BLAKE3 = "blake three"; jidoka = "jee-DOH-ka".
+- The whole demo runs in `hello/` so paths stay short on screen. State + world dir are gitignored.
+- Shortcut: `make hello` from the repo root runs all 7 commands with colored step headers. Use that as a safety net if you fumble the heredoc.
+- Land the close on the restored file content. No extra terminal output after it.
+
+## Quickstart (one command)
+
+```bash
+make hello
+```
+Runs the entire demo above with `[1/6] … [6/6]` step headers and ends on `✓ HEALED — contracts C1, C3, C5, C10 all exercised`.
