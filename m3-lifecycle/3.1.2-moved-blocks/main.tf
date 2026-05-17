@@ -16,7 +16,7 @@
 terraform {
   required_version = ">= 1.5.0"
   required_providers {
-    null  = { source = "hashicorp/null",  version = "~> 3.2" }
+    null  = { source = "hashicorp/null", version = "~> 3.2" }
     local = { source = "hashicorp/local", version = "~> 2.5" }
   }
 }
@@ -36,7 +36,7 @@ resource "local_file" "postgres_primary" {
     # Was: db-pkg → Now: postgres-primary
     data_directory=/var/lib/postgresql/15/main
   EOT
-  depends_on = [null_resource.nginx_web]
+  depends_on      = [null_resource.nginx_web]
 }
 
 # Moved blocks — declarative rename instruction. State migrates in place;

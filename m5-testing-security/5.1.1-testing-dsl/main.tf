@@ -16,7 +16,7 @@
 #   terraform test -filter=tests/basic.tftest.hcl
 
 terraform {
-  required_version = ">= 1.6.0"   # `terraform test` requires 1.6+
+  required_version = ">= 1.6.0" # `terraform test` requires 1.6+
   required_providers {
     local = { source = "hashicorp/local", version = "~> 2.5" }
   }

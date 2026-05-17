@@ -64,7 +64,7 @@ resource "local_file" "gitconfig" {
     [pull]
       rebase = true
   EOT
-  depends_on = [null_resource.home_dir]
+  depends_on      = [null_resource.home_dir]
 }
 
 # Equivalent of forjar's `vimrc` file resource.
@@ -79,7 +79,7 @@ resource "local_file" "vimrc" {
     set tabstop=4
     syntax on
   EOT
-  depends_on = [null_resource.home_dir]
+  depends_on      = [null_resource.home_dir]
 }
 
 # Equivalent of forjar's outputs: block.

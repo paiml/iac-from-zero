@@ -81,9 +81,43 @@ make demo-2.1.2       # saved plans
 make demo-5.1.3       # capstone canary fleet
 ```
 
-`make demo-all` is plan-only by default — it runs `tofu validate` + `tofu plan`
-on every `main.tf` and `forjar plan` on every `forjar.yaml`. No `apply` is
-executed unless you opt in with `make apply-<lesson-id>`.
+`make demo-all` is the forjar half of the gate — it runs `forjar validate`,
+`forjar plan`, and `forjar plan --json` on every `forjar.yaml`. The OpenTofu
+half lives in two separate targets so the two toolchains stay decoupled:
+
+```bash
+make tofu-validate    # tofu init -backend=false + tofu validate per main.tf
+make tofu-fmt         # tofu fmt -check per main.tf
+```
+
+No real apply runs unless you opt in with `make apply-<lesson-id>` (forjar
+side, requires Docker on PATH).
+
+## Labs
+
+The [`labs/`](labs/) tree is the **learner-doing** half of this repo. Five
+exercises map 1:1 to the five course modules, each with a starter
+`forjar.yaml`, a reference solution under `solution/`, and a committed
+`expected-*.json` fixture the solution must reproduce. CI gates the lab
+solutions against drift via:
+
+```bash
+make verify           # scripts/verify-fixtures.sh — diff solutions vs expected-*.json
+```
+
+See [`labs/README.md`](labs/README.md) for the lab map and per-lab structure.
+
+## Repo layout
+
+| Top-level path | Role |
+|---|---|
+| `m1-…/` … `m5-…/` | Reading: 12 OpenTofu ⇄ forjar side-by-side demos |
+| `labs/` | Doing: 5 exercises with `expected-*.json` fixtures |
+| `recipes/` | Reference: one full data-engineering recipe (`de-pipeline-host.yaml`) |
+| `capstone/` | The M5 capstone scaffold |
+| `includes/` | Shared YAML fragments (policy defaults, notify hooks); symlinked into every demo dir |
+| `scripts/` | `verify-fixtures.sh` and other CI helpers |
+| `assets/` | Hero SVG + PNG |
 
 ## License
 

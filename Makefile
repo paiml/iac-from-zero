@@ -16,7 +16,14 @@ SHELL := /bin/bash
 .SHELLFLAGS := -eu -o pipefail -c
 
 FORJAR ?= forjar
+TOFU ?= tofu
 TMPDIR := .tmp
+# Placeholder for tofu validate of the m5 state-encryption demo, which
+# references a `var.state_passphrase` at init time. The value is never
+# applied to real state — it just satisfies tofu's static-analysis pass.
+TF_VAR_state_passphrase ?= placeholder-for-validation-only-32chars
+export TF_VAR_state_passphrase
+
 DEMOS := \
 	m1-first-apply \
 	m2-state-and-plan/2.1.2-saved-plan \
@@ -32,19 +39,27 @@ DEMOS := \
 	m5-testing-security/5.1.3-capstone-canary-fleet
 
 .PHONY: help install demo-all validate plan plan-json fmt lint clean
+.PHONY: tofu-validate tofu-fmt verify
 
 help:
 	@echo "IAC from Zero — companion repo"
 	@echo ""
-	@echo "Top-level targets:"
-	@echo "  make install     install forjar from crates.io (cargo install forjar)"
-	@echo "  make demo-all    run validate + plan + plan-json across all 12 demos (CI gate)"
-	@echo "  make validate    forjar validate every demo"
-	@echo "  make plan        forjar plan every demo"
-	@echo "  make plan-json   forjar plan --json every demo (CI/CD policy gate format)"
-	@echo "  make fmt         forjar fmt every demo (write changes)"
-	@echo "  make lint        forjar lint every demo (read-only)"
-	@echo "  make clean       remove state/ + .forjar/ + temp plan files"
+	@echo "Top-level targets (forjar side):"
+	@echo "  make install        install forjar from crates.io"
+	@echo "  make demo-all       forjar validate + plan + plan-json across all 12 demos (CI gate)"
+	@echo "  make validate       forjar validate every demo"
+	@echo "  make plan           forjar plan every demo"
+	@echo "  make plan-json      forjar plan --json every demo"
+	@echo "  make fmt            forjar fmt every demo (write changes)"
+	@echo "  make lint           forjar lint every demo (read-only)"
+	@echo "  make clean          remove state/ + .forjar/ + .terraform/ + .tmp/"
+	@echo ""
+	@echo "Top-level targets (OpenTofu/Terraform side):"
+	@echo "  make tofu-validate  tofu init -backend=false + tofu validate per main.tf"
+	@echo "  make tofu-fmt       tofu fmt -check every main.tf (no writes)"
+	@echo ""
+	@echo "Lab fixtures (in labs/):"
+	@echo "  make verify         scripts/verify-fixtures.sh — diff lab solutions against expected-*.json"
 	@echo ""
 	@echo "Per-demo targets (one per directory):"
 	@for d in $(DEMOS); do echo "  make demo-$$d"; done
@@ -127,7 +142,40 @@ $(foreach d,$(DEMOS),$(eval $(call APPLY_template,$(d))))
 
 clean:
 	@for d in $(DEMOS); do \
-	  rm -rf "$$d/state" "$$d/.forjar" || exit 1; \
+	  rm -rf "$$d/state" "$$d/.forjar" "$$d/.terraform" || exit 1; \
+	  rm -f  "$$d/.terraform.lock.hcl" || exit 1; \
 	done
 	@rm -rf "$(TMPDIR)"
-	@echo "cleaned state/, .forjar/, $(TMPDIR)/"
+	@echo "cleaned state/, .forjar/, .terraform/, $(TMPDIR)/"
+
+# ---- OpenTofu / Terraform validation gate ----
+# `tofu init -backend=false` downloads providers without connecting to
+# a real backend, so it works in CI without cloud credentials. Then
+# `tofu validate` does the static-analysis pass.
+
+tofu-validate:
+	@command -v $(TOFU) >/dev/null 2>&1 || { \
+	  printf '\033[1;33m⚠  %s not on PATH — install OpenTofu (https://opentofu.org/docs/intro/install/) to run this target\033[0m\n' "$(TOFU)"; \
+	  exit 1; \
+	}
+	@for d in $(DEMOS); do \
+	  printf '  tofu validate %s ... ' "$$d"; \
+	  ( cd "$$d" && $(TOFU) init -backend=false -no-color >/dev/null && $(TOFU) validate -no-color >/dev/null ) && echo OK || { echo FAIL; exit 1; }; \
+	done
+
+tofu-fmt:
+	@command -v $(TOFU) >/dev/null 2>&1 || { \
+	  printf '\033[1;33m⚠  %s not on PATH — install OpenTofu to run this target\033[0m\n' "$(TOFU)"; \
+	  exit 1; \
+	}
+	@for d in $(DEMOS); do \
+	  printf '  tofu fmt -check %s ... ' "$$d"; \
+	  ( cd "$$d" && $(TOFU) fmt -check -no-color >/dev/null ) && echo OK || { echo "FAIL (run \`tofu fmt $$d\` to fix)"; exit 1; }; \
+	done
+
+# ---- Lab fixture verification ----
+# `scripts/verify-fixtures.sh` diffs each lab solution's
+# `forjar status --json` against its committed `expected-*.json`.
+
+verify:
+	@bash scripts/verify-fixtures.sh
