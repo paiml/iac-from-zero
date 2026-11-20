@@ -4,14 +4,14 @@
 #
 # Forjar:    `forjar plan --lock` writes a readable BLAKE3-hashed YAML
 #            lock file that `git diff` can review before `forjar apply`.
-# Terraform: `terraform plan -out=plan.tfplan` writes an OPAQUE BINARY
+# OpenTofu:  `tofu plan -out=plan.tfplan` writes an OPAQUE BINARY
 #            file. You cannot diff it in code review without running
-#            `terraform show plan.tfplan` to re-render it as text.
+#            `tofu show plan.tfplan` to re-render it as text.
 #
-# Run: terraform plan -out=plan.tfplan && terraform apply plan.tfplan
+# Run: tofu plan -out=plan.tfplan && tofu apply plan.tfplan
 #
 # Comparison checkpoint:
-#   file plan.tfplan                   # -> "data" (binary)
+#   file plan.tfplan                   # -> "Zip archive data" (binary)
 #   cat  forjar.lock                   # -> human-readable YAML w/ BLAKE3
 
 terraform {
@@ -56,6 +56,6 @@ output "app_name" {
 
 output "plan_workflow" {
   # The forjar equivalent in one line: `forjar plan --lock && git diff && forjar apply`
-  value       = "terraform plan -out=plan.tfplan && terraform apply plan.tfplan"
+  value       = "tofu plan -out=plan.tfplan && tofu apply plan.tfplan"
   description = "Two-step saved-plan workflow for CI/CD review gates"
 }
