@@ -96,8 +96,10 @@ resources:
       # Content managed by external process
       replica_count=3
     lifecycle:
+      # forjar#360: per-field lists cover owner/group/mode/size only;
+      # "*" suppresses drift for the whole externally-managed file.
       ignore_drift:
-        - content
+        - "*"
     tags: [lifecycle, app, external]
     resource_group: app
 
@@ -111,7 +113,7 @@ resources:
       {
         "protected_resources": ["db-data-dir", "db-config"],
         "create_before_destroy": ["app-config"],
-        "ignore_drift": {"external-config": ["content"]},
+        "ignore_drift": {"external-config": ["*"]},
         "lifecycle_version": "1.0"
       }
     depends_on: [db-config, app-config, external-config]
