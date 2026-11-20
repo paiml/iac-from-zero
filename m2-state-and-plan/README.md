@@ -13,7 +13,7 @@ plan output (cookbook recipe 31) against their forjar equivalents.
 | Video | Title | Comparison | Demo |
 |---|---|---|---|
 | 2.1.1 | Where State Lives | S3 + Consul lock vs Git + BLAKE3 | (no demo — concept lesson) |
-| 2.1.2 | Saved Plans | `terraform plan -out=plan.tfplan` vs `forjar plan --lock` | [`2.1.2-saved-plan/`](2.1.2-saved-plan/) |
+| 2.1.2 | Saved Plans | `tofu plan -out=plan.tfplan` vs `forjar plan --lock` | [`2.1.2-saved-plan/`](2.1.2-saved-plan/) |
 | 2.1.3 | JSON Plan Output | `terraform show -json` vs `forjar plan --format json` | [`2.1.3-json-plan/`](2.1.3-json-plan/) |
 
 ## Run
@@ -32,9 +32,9 @@ make demo-2.1.3
   DynamoDB lock — losing the bucket means losing the state.
 - forjar's BLAKE3 lock file IS the saved plan — readable YAML with hashes per
   resource; you diff it before apply with `git diff`.
-- `terraform plan -out=plan.tfplan` writes binary; `forjar plan --lock` writes
+- `tofu plan -out=plan.tfplan` writes binary; `forjar plan --lock` writes
   text — review-then-execute split, same workflow.
-- `terraform show -json plan.tfplan` and `forjar plan --format json` emit the
+- `tofu show -json plan.tfplan` and `forjar plan --format json` emit the
   same shape (`resource_changes` array, before/after diffs).
 - A CI policy script never needs to know which tool produced the plan; both
   Terraform and forjar speak the same JSON contract.

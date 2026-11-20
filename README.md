@@ -39,7 +39,7 @@ two files IS the lesson.
 | Lesson | OpenTofu feature | forjar concept | Demo directory |
 |---|---|---|---|
 | 1.1.3 | `terraform apply` | `forjar apply` + BLAKE3 lock | [`m1-first-apply/`](m1-first-apply/) |
-| 2.1.2 | `terraform plan -out=plan.tfplan` | `forjar plan --lock` | [`m2-state-and-plan/2.1.2-saved-plan/`](m2-state-and-plan/2.1.2-saved-plan/) |
+| 2.1.2 | `tofu plan -out=plan.tfplan` | `forjar plan --lock` | [`m2-state-and-plan/2.1.2-saved-plan/`](m2-state-and-plan/2.1.2-saved-plan/) |
 | 2.1.3 | `terraform show -json` | `forjar plan --format json` | [`m2-state-and-plan/2.1.3-json-plan/`](m2-state-and-plan/2.1.3-json-plan/) |
 | 3.1.1 | `lifecycle { prevent_destroy }` | idempotent recipe + content hash | [`m3-lifecycle/3.1.1-lifecycle/`](m3-lifecycle/3.1.1-lifecycle/) |
 | 3.1.2 | `moved { from to }` | recipe composition by BLAKE3 ID | [`m3-lifecycle/3.1.2-moved-blocks/`](m3-lifecycle/3.1.2-moved-blocks/) |

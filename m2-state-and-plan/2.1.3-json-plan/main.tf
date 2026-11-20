@@ -4,12 +4,12 @@
 #
 # Forjar:    `forjar plan --format json` emits a structured plan with the
 #            same shape (resource_changes[] with before/after).
-# Terraform: requires a TWO-STEP conversion — first emit the binary
-#            tfplan, then `terraform show -json` to convert it.
+# OpenTofu:  requires a TWO-STEP conversion — first emit the binary
+#            tfplan, then `tofu show -json` to convert it.
 #
 # Run:
-#   terraform plan -out=plan.tfplan
-#   terraform show -json plan.tfplan > plan.json
+#   tofu plan -out=plan.tfplan
+#   tofu show -json plan.tfplan > plan.json
 #
 # Sample CI policy gates (jq queries against plan.json):
 #   # Count resources scheduled for create:
@@ -51,7 +51,7 @@ resource "local_file" "web_config" {
 }
 
 # Embedded OPA / Rego policy — runs against the JSON plan emitted by
-# `terraform show -json`. forjar's CI policy gate uses the SAME shape,
+# `tofu show -json`. forjar's CI policy gate uses the SAME shape,
 # so this Rego applies unchanged to `forjar plan --format json`.
 resource "local_file" "opa_policy" {
   filename        = "/tmp/forjar-demo/etc/forjar/policies/plan-check.rego"
@@ -69,6 +69,6 @@ resource "local_file" "opa_policy" {
 }
 
 output "json_plan_command" {
-  value       = "terraform show -json plan.tfplan | jq '.resource_changes | length'"
+  value       = "tofu show -json plan.tfplan | jq '.resource_changes | length'"
   description = "Count plan resources for CI gating (forjar parity: forjar plan --format json | jq)"
 }
